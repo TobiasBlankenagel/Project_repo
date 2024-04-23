@@ -26,7 +26,7 @@ def display_results(data):
         st.write("Gesamte Antwortdaten:")
         st.json(data)  # Zeigt die gesamten JSON-Daten in einer ansprechbaren Form an
 
-        
+
         items = data['data']
         df = pd.DataFrame.from_records([{
             "Title": item["presentation"]["title"],
@@ -35,7 +35,6 @@ def display_results(data):
             "Localized Name": item["navigation"]["localizedName"],
             "Entity Type": item["navigation"]["entityType"],
             "Entity ID": item["navigation"]["entityId"],
-            "From ID": item["navigation"]["fromID"]
         } for item in items])
         st.table(df)
     else:
