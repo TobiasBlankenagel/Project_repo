@@ -14,13 +14,16 @@ def fetch_autocomplete_data(query):
 
 def display_autocomplete_results(data):
     if data and 'data' in data and data['data']:
-        airports = [item for item in data['data'] if 'id' in item]  # Liste aller Flughäfen mit ID
-        if airports:
-            st.write("Gefundene Flughäfen:")
-            for airport in airports:
-                st.write(f"ID: {airport['id']}, Ort: {airport['presentation']['title']} ({airport['presentation']['suggestionTitle']}), {airport['presentation']['subtitle']}")
-        else:
-            st.error("Keine Flughäfen gefunden.")
+        st.write("Gefundene Flughäfen und zugehörige Entitäten:")
+        for item in data['data']:
+            id = item.get('id', 'N/A')
+            title = item['presentation']['title']
+            suggestion_title = item['presentation']['suggestionTitle']
+            subtitle = item['presentation']['subtitle']
+            entity_id = item['navigation']['entityId']
+            entity_type = item['navigation']['entityType']
+            localized_name = item['navigation']['localizedName']
+            st.write(f"ID: {id}, Titel: {title}, Vorschlagstitel: {suggestion_title}, Untertitel: {subtitle}, Entitäts-ID: {entity_id}, Entitätstyp: {entity_type}, Lokalisierter Name: {localized_name}")
     else:
         st.error("Keine Daten gefunden oder unerwartete Antwortstruktur.")
 
