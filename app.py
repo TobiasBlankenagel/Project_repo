@@ -31,6 +31,7 @@ def main():
     query = st.text_input('Enter a city name to search for airports:', 'London')
     if st.button('Search'):
         result = fetch_airport_data(query)
+        st.write(result)
         if 'error' in result:
             st.error(result['error'])
         else:
