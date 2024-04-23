@@ -1,5 +1,22 @@
 import requests
 
+def check_api_status():
+    url = 'https://skyscanner80.p.rapidapi.com/api/v1/checkServer'
+    headers = {
+        'X-RapidAPI-Key': '20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a',
+        'X-RapidAPI-Host': 'skyscanner80.p.rapidapi.com'
+    }
+    
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()  # gibt den Status des Servers zurück
+        else:
+            return "API nicht erreichbar"
+    except requests.exceptions.RequestException as e:
+        return str(e)  # Fehler als String zurückgeben
+
+
 def fetch_one_way_flights(from_id, to_id, depart_date):
     url = 'https://skyscanner80.p.rapidapi.com/api/v1/flights/search-one-way'
     headers = {
