@@ -51,8 +51,8 @@ def display_flights(flights_data):
         st.write("Gesamte Antwortdaten von der API:")
         st.json(flights_data)  # Zeigt die gesamte Antwort als JSON im Interface
 
-        if 'results' in flights_data:
-            flights = flights_data['results']
+        if 'data' in flights_data:
+            flights = flights_data['data']
             if flights:
                 df = pd.DataFrame(flights)
                 st.write("Nächste Flüge vom ausgewählten Flughafen:")
