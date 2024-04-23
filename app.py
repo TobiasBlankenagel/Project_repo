@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+from datetime import date
 
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
@@ -10,38 +11,73 @@ def fetch_autocomplete_data(query):
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
-    return response
+    return response.json()
 
-def display_results(raw_response):
-    if raw_response.status_code == 200:
-        data = raw_response.json()
-        st.write("Gesamte Antwortdaten:")
-        st.json(data)  # Zeigt die gesamten JSON-Daten in einer ansprechbaren Form an
-
-        if 'data' in data:
-            items = data['data']
-            df = pd.DataFrame.from_records([{
-                "Title": item["presentation"]["title"],
-                "Suggestion Title": item["presentation"]["suggestionTitle"],
-                "Subtitle": item["presentation"]["subtitle"],
-                "Localized Name": item["navigation"]["localizedName"],
-                "Entity Type": item["navigation"]["entityType"],
-                "Entity ID": item["navigation"]["entityId"],
-                "From ID": item["navigation"]["fromID"]
-            } for item in items if "navigation" in item])
-            st.table(df)
+def display_airports(data):
+    if 'data' in data:
+        airports = [item for item in data['data'] if item["navigation"]["entityType"] == "AIRPORT"]
+        if airports:
+            df = pd.DataFrame(airports)
+            st.write("Wählen Sie einen Flughafen aus der Liste:")
+            option = st.selectbox('Flughäfen:', airports, format_func=lambda x: f"{x['presentation']['title']} ({x['navigation']['localizedName']})")
+            return option
         else:
-            st.error("Keine Ergebnisse gefunden.")
+            st.error("Keine Flughäfen gefunden.")
     else:
-        st.error(f"Fehler {raw_response.status_code}: {raw_response.text}")
+        st.error("Keine Daten gefunden.")
+
+def fetch_flights(from_id, depart_date):
+    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-one-way"
+    querystring = {
+        "fromId": from_id,
+        "departDate": depart_date,
+        "adults": "1",
+        "currency": "USD",
+        "market": "US",
+        "locale": "en-US"
+    }
+    headers = {
+        "X-RapidAPI-Key": "YOUR_API_KEY",
+        "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    return response.json()
+
+def display_flights(flights_data):
+    if 'results' in flights_data:
+        flights = flights_data['results']
+        if flights:
+            df = pd.DataFrame(flights)
+            st.write("Nächste Flüge vom ausgewählten Flughafen:")
+            st.dataframe(df)
+        else:
+            st.error("Keine Flüge gefunden.")
+    else:
+        st.error("Fehler bei der Flugabfrage.")
 
 def main():
-    st.title('Auto-Complete Suche für Flughäfen und Städte')
-    query = st.text_input('Geben Sie einen Standort ein', 'New York')
+    st.title('Auto-Complete Suche für Flughäfen und Flüge')
+    query = st.text_input('Geben Sie einen Flughafen ein', 'New York')
 
-    if st.button('Suche'):
-        response = fetch_autocomplete_data(query)
-        display_results(response)
+    if st.button('Flughafen suchen'):
+        autocomplete_data = fetch_autocomplete_data(query)
+        selected_airport = display_airports(autocomplete_data)
+        if selected_airport:
+            depart_date = st.date_input("Wählen Sie das Abflugdatum", min_value=date.today())
+            flights_data = fetch_flights(selected_airport["navigation"]["fromID"], depart_date.isoformat())
+            display_flights(flights_data)
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
+
