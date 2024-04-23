@@ -2,22 +2,15 @@ import streamlit as st
 import requests
 import pandas as pd
 
-# Verbindung
-
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "US", "locale": "en-US"}
     headers = {
-        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
+        "X-RapidAPI-Key": "YOUR_API_KEY",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
-    
-# Daten zur Eingabe finden
+    return response
 
 def display_results(raw_response):
     if raw_response.status_code == 200:
@@ -42,15 +35,13 @@ def display_results(raw_response):
     else:
         st.error(f"Fehler {raw_response.status_code}: {raw_response.text}")
 
-# Eingabefeld
-
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Städte')
     query = st.text_input('Geben Sie einen Standort ein', 'New York')
 
     if st.button('Suche'):
-        result = fetch_autocomplete_data(query)
-        display_results(result)
+        response = fetch_autocomplete_data(query)
+        display_results(response)
 
 if __name__ == "__main__":
     main()
