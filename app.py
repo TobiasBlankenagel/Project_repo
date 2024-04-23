@@ -80,8 +80,7 @@ def fetch_all_flights():
 def fetch_geo_data():
     url = "https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/de-DE"
     headers = {
-        "Accept": "application/json",
-        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Your API key
+        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Replace with your actual API key
     }
     response = requests.get(url, headers=headers)
     
