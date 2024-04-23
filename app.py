@@ -39,7 +39,6 @@ def display_results(data):
                 "Name": [item['presentation']['title'] for item in airports],
                 "Entity ID": [item['navigation']['entityId'] for item in airports]
             })
-            st.write(df)
             return df
         else:
             st.error("Keine Flughäfen gefunden.")
@@ -53,7 +52,11 @@ def main():
     if st.button('Suche'):
         result = fetch_autocomplete_data(query)
         df = display_results(result)
-        selected_id = st.selectbox('Wählen Sie einen Flughafen', df['Entity ID']) if df is not None else None
+        if df is not None:
+            st.session_state['airport_df'] = df  # Speichere das DataFrame im Session State
+
+    if 'airport_df' in st.session_state:
+        selected_id = st.selectbox('Wählen Sie einen Flughafen', st.session_state['airport_df']['Entity ID'])
         depart_date = st.date_input('Abflugdatum', min_value=datetime.today())
 
         if st.button('Finde Flüge'):
