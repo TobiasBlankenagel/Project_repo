@@ -24,7 +24,8 @@ def display_results(data):
             "Subtitle": item["presentation"]["subtitle"],
             "Localized Name": item["navigation"]["localizedName"],
             "Entity Type": item["navigation"]["entityType"],
-            "Entity ID": item["navigation"]["entityId"]
+            "Entity ID": item["navigation"]["entityId"],
+            "From ID": item["navigation"]["fromID"]
         } for item in items])
         st.table(df)
     else:
