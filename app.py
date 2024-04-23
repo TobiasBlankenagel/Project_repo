@@ -12,6 +12,18 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
+def display_autocomplete_results(data):
+    if data and 'data' in data and data['data']:
+        airports = [item for item in data['data'] if 'id' in item]  # Liste aller Flughäfen mit ID
+        if airports:
+            st.write("Gefundene Flughäfen:")
+            for airport in airports:
+                st.write(f"ID: {airport['id']}, Ort: {airport['presentation']['title']} ({airport['presentation']['suggestionTitle']}), {airport['presentation']['subtitle']}")
+        else:
+            st.error("Keine Flughäfen gefunden.")
+    else:
+        st.error("Keine Daten gefunden oder unerwartete Antwortstruktur.")
+
 def main():
     st.title('Auto-Complete Suche für Flüge von einem Ort')
     with st.form("search_form"):
@@ -23,17 +35,7 @@ def main():
             autocomplete_data = fetch_autocomplete_data(query)
             st.write("API-Antwortdaten:")
             st.json(autocomplete_data)  # Zeigt die gesamte JSON-Antwort an
-
-            # Beispiel zum Suchen des ersten verfügbaren Flughafens mit 'id'
-            if 'data' in autocomplete_data and any(item["navigation"]["entityType"] == "AIRPORT" for item in autocomplete_data['data']):
-                for airport in autocomplete_data['data']:
-                    if airport["navigation"]["entityType"] == "AIRPORT":
-                        st.write("Gefundene Flughafen-ID:", airport["navigation"]["id"])
-                        break
-                else:
-                    st.error("Keine Flughafen-ID in der Antwort gefunden.")
-            else:
-                st.error("Keine Flughäfen gefunden für den eingegebenen Ort.")
+            display_autocomplete_results(autocomplete_data)
 
 if __name__ == "__main__":
     main()
