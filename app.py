@@ -19,8 +19,6 @@ def display_airports(data):
         if airports:
             st.write("Wählen Sie einen Flughafen aus der Liste:")
             option = st.selectbox('Flughäfen:', airports, format_func=lambda x: f"{x['presentation']['title']} ({x['navigation']['localizedName']})")
-            st.write("Struktur des ausgewählten Items:")
-            st.json(option)  # Zeigt die Struktur des ausgewählten Flughafen-Items an
             return option
         else:
             st.error("Keine Flughäfen gefunden.")
@@ -48,16 +46,37 @@ def fetch_flights(from_id, depart_date):
         st.error(f"Fehler bei der Flugabfrage: {response.status_code} - {response.text}")
         return None
 
+def fetch_flight_details(itinerary_id, token):
+    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/detail"
+    querystring = {
+        "itineraryId": itinerary_id,
+        "token": token,
+        "currency": "USD",
+        "market": "US",
+        "locale": "en-US"
+    }
+    headers = {
+        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
+        "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    return response.json() if response.status_code == 200 else None
+
 def display_flights(flights_data):
     if flights_data:
         st.write("Gesamte Antwortdaten von der API:")
         st.json(flights_data)  # Zeigt die gesamte Antwort als JSON im Interface
 
-        if 'data' in flights_data:
+        if 'data' in flights_data and flights_data['data'].get('everywhereDestination'):
             flights = flights_data['data']['everywhereDestination']['results']
             if flights:
-                df = pd.DataFrame(flights)
-                st.write("Nächste Flüge vom ausgewählten Flughafen:")
+                flight_details = []
+                for flight in flights[:5]:  # Get details for the first five flights
+                    details = fetch_flight_details(flight["content"]["location"]["id"], flights_data["token"])
+                    if details:
+                        flight_details.append(details)
+                df = pd.DataFrame(flight_details)
+                st.write("Detailierte Fluginformationen:")
                 st.dataframe(df)
             else:
                 st.error("Keine Flüge gefunden.")
@@ -66,11 +85,9 @@ def display_flights(flights_data):
     else:
         st.error("Keine Antwortdaten erhalten.")
 
-
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flüge')
     query = st.text_input('Geben Sie einen Flughafen ein', 'New York')
-
     if st.button('Flughafen suchen'):
         autocomplete_data = fetch_autocomplete_data(query)
         selected_airport = display_airports(autocomplete_data)
