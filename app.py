@@ -1,26 +1,46 @@
-import requests
-import datetime
+
+
+
+
+
+
+
+
+
+
 import streamlit as st
+import requests
+import os
 
 
+# Die Funktion, die die API aufruft
+def get_flight_data(from_airport, to_airport):
+    url = 'https://skyscanner80.p.rapidapi.com/api/v1/checkServer'  # URL aktualisieren
+    headers = {
+	"X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
+	"X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
+    }
 
+    
+    try:
+        response = requests.get(url, headers=headers)
+        return response.json()  # Antwort als JSON zurückgeben
+    except requests.exceptions.RequestException as e:
+        return str(e)  # Fehler als String zurückgeben
 
-# Function to get weather data
-def get_weather(city):
-    api_key = "5609e5c95ae59033e36538f65e15b9da"
-    weather_data = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}")
-    weather = weather_data.json()['weather'][0]['main']
-    temp = round(weather_data.json()['main']['temp'])
-    temp_celsius = round(temp - 273,15)  # Convert temperature from Fahrenheit to Celsius
-    return weather, temp_celsius
+# Streamlit-Seite konfigurieren
+st.title('Flugsuche')
 
-# Streamlit app
-def main():
-    st.title("Weather App")
-    city = st.text_input("Enter City")
-    if st.button("Get Weather"):
-        weather, temp = get_weather(city)
-        st.write(f"The weather in {city} is {weather} with a temperature of {temp}°C")
+# Eingabefelder für Flughäfen
+from_airport = st.text_input('Abflughafen', '')
+to_airport = st.text_input('Zielflughafen', '')
 
-if __name__ == "__main__":
-    main()
+# Suchknopf
+if st.button('Suche günstige Flüge'):
+    if from_airport and to_airport:
+        # API aufrufen und Daten holen
+        result = get_flight_data(from_airport, to_airport)
+        st.write(result)
+    else:
+        st.error('Bitte geben Sie sowohl den Abflug- als auch den Zielflughafen an.')
+
