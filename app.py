@@ -1,94 +1,46 @@
 import streamlit as st
 import requests
-from datetime import date
+import json
 
-# Function to fetch autocomplete data from Skyscanner API
-def fetch_autocomplete_data(query):
-    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
-    querystring = {"query": query, "market": "US", "locale": "en-US"}
+# Function to fetch flight data for multi-city flights
+def fetch_flights_multi_city(legs, class_of_service, sort_order, currency_code):
+    url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlightsMultiCity"
+    querystring = {
+        "legs": json.dumps(legs),
+        "classOfService": class_of_service,
+        "sortOrder": sort_order,
+        "currencyCode": currency_code
+    }
     headers = {
         "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
-        "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
+        "X-RapidAPI-Host": "tripadvisor16.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-# Function to fetch flights data based on airport ID and departure date
-def fetch_flights(from_id, depart_date):
-    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-everywhere"
-    querystring = {
-        "fromId": from_id,
-        "departDate": depart_date,
-        "adults": "1",
-        "currency": "EUR",
-        "market": "DE",
-        "locale": "de-DE"
-    }
-    headers = {
-        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
-        "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    return response.json() if response.status_code == 200 else None
-
-# Function to process and save autocomplete data
-def process_and_save_autocomplete_data(data):
-    if data and 'data' in data and data['data']:
-        st.write("Found airports and related entities:")
-        airports = []
-        for item in data['data']:
-            id = item.get('id', 'N/A')
-            title = item['presentation']['title']
-            subtitle = item['presentation']['subtitle']
-            st.write(f"ID: {id}, Title: {title}, Subtitle: {subtitle}")
-            if item['navigation']['entityType'] == 'AIRPORT':
-                airports.append({'id': id, 'title': title})
-        if airports:
-            st.session_state['airports'] = airports
-            st.write("Airports saved!")
-        else:
-            st.write("No airports to save found.")
-    else:
-        st.error("No data found or unexpected response structure.")
-
-# Function to fetch and display all flights from saved airports
-def fetch_all_flights():
-    if 'airports' in st.session_state and st.session_state['airports'] and 'depart_date' in st.session_state:
-        flights_info = []
-        destinations = []
-        for airport in st.session_state['airports']:
-            flight_data = fetch_flights(airport['id'], st.session_state['depart_date'].isoformat())
-            if flight_data:
-                flights_info.append(flight_data)
-                for result in flight_data['data']['everywhereDestination']['results']:
-                    if 'content' in result and 'location' in result['content'] and 'id' in result['content']['location']:
-                        destinations.append(result['content']['location']['id'])
-        if flights_info:
-            st.write("Found flights from all saved airports:")
-            for info in flights_info:
-                st.json(info)
-            display_destinations(destinations)
-        else:
-            st.write("No flights found.")
-    else:
-        st.error("No saved airports or date. Please save airports and select a date.")
-
-# Main function to run on Streamlit
+# Streamlit application
 def main():
-    st.title('Auto-Complete Search for Flights from a Location')
+    st.title('Multi-City Flight Search')
 
-    with st.form("search_form"):
-        query = st.text_input('Enter a location', '')
-        depart_date = st.date_input("Choose departure date for all flights", min_value=date.today())
-        submitted = st.form_submit_button("Magische Suche")
+    # User input for the flight search
+    with st.form("flight_search"):
+        # JSON input for legs
+        legs_input = st.text_area("Enter flight legs in JSON format:", 
+                                  '[{"sourceAirportCode":"BOS","destinationAirportCode":"LON","date":"2023-10-18"},{"sourceAirportCode":"LON","destinationAirportCode":"BOS","date":"2023-10-26"}]')
+        class_of_service = st.selectbox("Class of Service", ["Economy", "Business", "First"])
+        sort_order = st.selectbox("Sort Order", ["Price", "Duration"])
+        currency_code = st.selectbox("Currency Code", ["USD", "EUR", "GBP"])
+        submit_button = st.form_submit_button("Search Flights")
 
-        if submitted:
-            st.session_state['depart_date'] = depart_date
-            autocomplete_data = fetch_autocomplete_data(query)
-            st.write("API response data:")
-            st.json(autocomplete_data)
-            process_and_save_autocomplete_data(autocomplete_data)
-            fetch_all_flights()
+        if submit_button:
+            try:
+                # Parsing the JSON input for legs
+                legs = json.loads(legs_input)
+                result = fetch_flights_multi_city(legs, class_of_service, sort_order, currency_code)
+                st.write("API Response:")
+                st.json(result)
+            except json.JSONDecodeError:
+                st.error("Invalid JSON format. Please correct it and try again.")
 
 if __name__ == "__main__":
     main()
