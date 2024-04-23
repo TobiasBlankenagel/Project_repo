@@ -1,12 +1,12 @@
 import requests
 
-url = "https://booking-com15.p.rapidapi.com/api/v1/flights/searchFlights"
+url = "https://travel-advisor.p.rapidapi.com/airports/search"
 
-querystring = {"fromId":"BOM.AIRPORT","toId":"DEL.AIRPORT","departDate":"<REQUIRED>","pageNo":"1","adults":"1","children":"0,17","currency_code":"AED"}
+querystring = {"query":"new york","locale":"en_US"}
 
 headers = {
 	"X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
-	"X-RapidAPI-Host": "booking-com15.p.rapidapi.com"
+	"X-RapidAPI-Host": "travel-advisor.p.rapidapi.com"
 }
 
 response = requests.get(url, headers=headers, params=querystring)
