@@ -21,8 +21,8 @@ def fetch_flights(from_id, depart_date):
         "departDate": depart_date,
         "adults": "1",
         "currency": "EUR",
-        "market": "US",
-        "locale": "en-US"
+        "market": "DE",
+        "locale": "de-DE"
     }
     headers = {
         "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
