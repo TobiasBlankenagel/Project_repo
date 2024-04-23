@@ -1,46 +1,44 @@
-
-
-
-
-
-
-
-
-
-
-import streamlit as st
 import requests
-import os
 
-
-# Die Funktion, die die API aufruft
-def get_flight_data(from_airport, to_airport):
-    url = 'https://skyscanner80.p.rapidapi.com/api/v1/checkServer'  # URL aktualisieren
+def check_api_status():
+    url = 'https://skyscanner80.p.rapidapi.com/api/v1/checkServer'
     headers = {
-	"X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
-	"X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
+        'X-RapidAPI-Key': 'dein-api-key-hier',
+        'X-RapidAPI-Host': 'skyscanner80.p.rapidapi.com'
     }
-
     
     try:
         response = requests.get(url, headers=headers)
-        return response.json()  # Antwort als JSON zurückgeben
+        if response.status_code == 200:
+            return response.json()  # gibt den Status des Servers zurück
+        else:
+            return "API nicht erreichbar"
     except requests.exceptions.RequestException as e:
         return str(e)  # Fehler als String zurückgeben
 
-# Streamlit-Seite konfigurieren
-st.title('Flugsuche')
 
-# Eingabefelder für Flughäfen
-from_airport = st.text_input('Abflughafen', '')
-to_airport = st.text_input('Zielflughafen', '')
+import streamlit as st
 
-# Suchknopf
-if st.button('Suche günstige Flüge'):
-    if from_airport and to_airport:
-        # API aufrufen und Daten holen
-        result = get_flight_data(from_airport, to_airport)
-        st.write(result)
+def main():
+    st.title('Flugsuche')
+
+    # Überprüfe zuerst die API-Verfügbarkeit
+    status = check_api_status()
+    if status.get('status'):
+        st.success('API ist online: ' + status.get('message'))
+        # Eingabefelder für die Benutzer
+        from_airport = st.text_input('Abflughafen')
+        to_airport = st.text_input('Zielflughafen')
+        depart_date = st.date_input('Abflugdatum')
+
+        if st.button('Flüge suchen'):
+            if from_airport and to_airport and depart_date:
+                # Hier würdest du deine Funktion zum Abrufen der Flugdaten aufrufen
+                st.write('Suche Flüge...')
+            else:
+                st.error('Bitte alle erforderlichen Felder ausfüllen!')
     else:
-        st.error('Bitte geben Sie sowohl den Abflug- als auch den Zielflughafen an.')
+        st.error('API ist derzeit nicht erreichbar: ' + status)
 
+if __name__ == "__main__":
+    main()
