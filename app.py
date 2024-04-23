@@ -55,18 +55,23 @@ def process_and_save_autocomplete_data(data):
 def fetch_all_flights():
     if 'airports' in st.session_state and st.session_state['airports'] and 'depart_date' in st.session_state:
         flights_info = []
+        formatted_depart_date = st.session_state['depart_date'].isoformat()
         for airport in st.session_state['airports']:
-            flight_data = fetch_flights(airport['id'], st.session_state['depart_date'].isoformat())
-            if flight_data:
-                flights_info.append(flight_data)
+            flight_data = fetch_flights(airport['id'], formatted_depart_date)
+            if flight_data and 'Quotes' in flight_data:
+                # Filter flights by the selected date, assuming the API returns 'QuoteDateTime' with dates
+                relevant_flights = [flight for flight in flight_data['Quotes'] if flight['QuoteDateTime'].startswith(formatted_depart_date)]
+                if relevant_flights:
+                    flights_info.append(relevant_flights)
         if flights_info:
-            st.write("Found flights from all saved airports:")
+            st.write("Found flights from all saved airports on the selected date:")
             for info in flights_info:
                 st.json(info)
         else:
-            st.write("No flights found.")
+            st.write("No flights found for the selected date.")
     else:
         st.error("No saved airports or date. Please save airports and select a date.")
+
 
 # Main function to run the Streamlit application
 def main():
