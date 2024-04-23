@@ -40,13 +40,17 @@ def fetch_flights(from_id, depart_date):
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
-    if response.status_code != 200:
+    if response.status_code == 200:
+        return response.json()
+    else:
         st.error(f"Fehler bei der Flugabfrage: {response.status_code} - {response.text}")
         return None
-    return response.json()
 
 def display_flights(flights_data):
     if flights_data:
+        st.write("Gesamte Antwortdaten von der API:")
+        st.json(flights_data)  # Zeigt die gesamte Antwort als JSON im Interface
+
         if 'results' in flights_data:
             flights = flights_data['results']
             if flights:
@@ -56,7 +60,7 @@ def display_flights(flights_data):
             else:
                 st.error("Keine Flüge gefunden.")
         else:
-            st.error("Fehler in den Flugdaten.")
+            st.error("Fehler in den Flugdaten oder unerwartete Struktur der API-Antwort.")
     else:
         st.error("Keine Antwortdaten erhalten.")
 
