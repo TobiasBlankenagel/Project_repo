@@ -12,7 +12,6 @@ def fetch_airport_data(location):
     if response.status_code == 200:
         return response.json()
     else:
-        st.error(f"API Request Failed: {response.status_code}, {response.text}")
         return None
 
 def main():
