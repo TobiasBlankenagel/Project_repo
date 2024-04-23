@@ -5,11 +5,7 @@ def fetch_airport_data(query):
     url = "https://priceline-com-provider.p.rapidapi.com/v2/flight/autoComplete"
     querystring = {
         "string": query,
-        "pois": "true",
-        "hotels": "true",
-        "regions": "true",
-        "airports": "true",
-        "cities": "true"
+        "airports": "true"
     }
     headers = {
         "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
