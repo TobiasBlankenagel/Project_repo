@@ -81,7 +81,7 @@ def fetch_geo_data(locale):
     url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
     headers = {
         "Accept": "application/json",
-        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  
+        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Corrected header parameter name
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
@@ -93,7 +93,8 @@ def fetch_geo_data(locale):
         else:
             st.write("No places found.")
     else:
-        st.write("Failed to fetch data.")
+        st.write(f"Failed to fetch data. Status Code: {response.status_code}")
+
 
 
 # Funktion, um herauszufinden an welchen Ort die Flüge fliegen
