@@ -119,8 +119,9 @@ def main():
     st.title('Auto-Complete Search for Flights from a Location')
 
     if st.button("Fetch Geo Data"):
+        locale = 'de-DE'
         fetch_geo_data(locale)
-        
+
     if 'airports' not in st.session_state:
         st.session_state['airports'] = []
 
