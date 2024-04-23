@@ -34,6 +34,7 @@ def fetch_flights(from_id, depart_date):
 
 # speichert die gefundenen Airports ab
 def process_and_save_autocomplete_data(data):
+    st.json(data)
     if data and 'data' in data and data['data']:
         st.write("Found airports and related entities:")
         airports = []
