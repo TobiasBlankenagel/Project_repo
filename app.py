@@ -23,8 +23,11 @@ def extract_airport_names(data):
         results = data.get('getAirAutoComplete', {}).get('results', {}).get('getSolr', {}).get('results', {}).get('data', {}).get('airport_data', {})
         for key, airport in results.items():
             if key.startswith('airport_'):
-                airport_list.append(airport.get('airport'))
+                name = airport.get('airport', 'Unknown Airport')
+                iata = airport.get('iata', 'N/A')
+                airport_list.append((name, iata))
     return airport_list
+
 
 def main():
     st.title('Airport Search Tool')
