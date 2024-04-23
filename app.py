@@ -57,34 +57,33 @@ def process_and_save_autocomplete_data(data):
 def fetch_all_flights():
     if 'airports' in st.session_state and st.session_state['airports'] and 'depart_date' in st.session_state:
         flights_info = []
+        destinations = []
         for airport in st.session_state['airports']:
             flight_data = fetch_flights(airport['id'], st.session_state['depart_date'].isoformat())
             if flight_data:
                 flights_info.append(flight_data)
+                for result in flight_data['data']['everywhereDestination']['results']:
+                    if 'content' in result and 'location' in result['content'] and 'id' in result['content']['location']:
+                        destinations.append(result['content']['location']['id'])
         if flights_info:
             st.write("Found flights from all saved airports:")
             for info in flights_info:
                 st.json(info)
-                display_destination_by_entityId(info)  # New function call to display destinations
+            display_destinations(destinations)  # Call to display destinations
         else:
             st.write("No flights found.")
     else:
         st.error("No saved airports or date. Please save airports and select a date.")
 
 
-
 # Funktion, um herauszufinden an welchen Ort die Flüge fliegen
-def display_destination_by_entityId(flights_info):
-    if flights_info and 'places' in flights_info and 'quotes' in flights_info:
-        places = {place['entityId']: place for place in flights_info['places']}
-        for quote in flights_info['quotes']:
-            if 'destinationId' in quote:
-                destination_id = quote['destinationId']
-                if destination_id in places:
-                    destination_place = places[destination_id]
-                    st.write(f"Destination: {destination_place['name']} - Price: {quote['price']}")
+def display_destinations(destinations):
+    if destinations:
+        st.write("Destinations (Entity IDs):")
+        for destination in destinations:
+            st.write(destination)
     else:
-        st.write("No detailed destination data available.")
+        st.write("No destinations found.")
 
 
 
