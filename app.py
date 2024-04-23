@@ -78,7 +78,7 @@ def fetch_all_flights():
 
 # entityid codes auflisten
 def fetch_geo_data(locale):
-    url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
+    url = "https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/nearest"
     response = requests.get(url)
     
     if response.status_code == 401:
