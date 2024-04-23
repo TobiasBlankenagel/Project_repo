@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from datetime import date
 
-# Fetches autocomplete data for flight locations based on user input
+# Autocomplete Suchleiste für Nutzer
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "US", "locale": "en-US"}
@@ -13,14 +13,14 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-# Fetches flight data from the Skyscanner API based on the given airport ID and departure date
+# Findet die Flugdaten über Skyscanner API basierend auf airport ID und Ablugsdatum
 def fetch_flights(from_id, depart_date):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-everywhere"
     querystring = {
         "fromId": from_id,
         "departDate": depart_date,
         "adults": "1",
-        "currency": "USD",
+        "currency": "EUR",
         "market": "US",
         "locale": "en-US"
     }
