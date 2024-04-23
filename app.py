@@ -64,6 +64,16 @@ def display_flights(flights_data):
     else:
         st.error("Keine Antwortdaten erhalten.")
 
+def extract_flight_destinations(result_ids, airports):
+    destinations = []
+    for result_id in result_ids:
+        for airport in airports:
+            if result_id == f"location-{airport['id']}":
+                destinations.append(airport)
+                break
+    return destinations
+
+
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flüge')
     query = st.text_input('Geben Sie einen Flughafen ein', 'New York')
@@ -76,5 +86,14 @@ def main():
             flights_data = fetch_flights(selected_airport["id"], depart_date.isoformat())
             display_flights(flights_data)
 
+            # Neue Funktionalität zum Extrahieren und Anzeigen der angeflogenen Flughäfen
+            if flights_data and 'data' in flights_data:
+                result_ids = flights_data['data']['everywhereDestination']['buckets'][0]['resultIds']
+                destinations = extract_flight_destinations(result_ids, airports)
+                st.write("Angeflogene Flughäfen:")
+                for destination in destinations:
+                    st.write(f"{destination['presentation']['title']} ({destination['navigation']['localizedName']})")
+
 if __name__ == "__main__":
     main()
+
