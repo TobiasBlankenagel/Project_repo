@@ -81,19 +81,22 @@ def fetch_geo_data(locale):
     url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
     headers = {
         "Accept": "application/json",
-        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Corrected header parameter name
+        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Your API key
     }
     response = requests.get(url, headers=headers)
-    if response.status_code == 200:
+    
+    if response.status_code == 401:
+        st.error("Unauthorized. Check your API key and permissions.")
+    elif response.status_code != 200:
+        st.error(f"Failed to fetch data. Status Code: {response.status_code}")
+    else:
         data = response.json()
         if 'places' in data:
             st.write("Geographical Locations (Entity IDs and Names):")
             for place in data['places']:
                 st.write(f"Entity ID: {place['entityId']}, Name: {place['name']}")
         else:
-            st.write("No places found.")
-    else:
-        st.write(f"Failed to fetch data. Status Code: {response.status_code}")
+            st.error("No places found in the response.")
 
 
 
