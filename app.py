@@ -54,17 +54,19 @@ def display_flights(flights_data):
 
 def main():
     st.title('Auto-Complete Suche für Flüge von einem Ort')
-    depart_date = st.date_input("Wählen Sie das Abflugdatum", min_value=date.today())
-    query = st.text_input('Geben Sie einen Ort ein', 'New York')
-
-    if st.button('Flüge suchen'):
-        autocomplete_data = fetch_autocomplete_data(query)
-        if 'data' in autocomplete_data and any(item["navigation"]["entityType"] == "AIRPORT" for item in autocomplete_data['data']):
-            city_id = autocomplete_data['data'][0]['navigation']['id']  # Assumes the first airport ID corresponds to the city
-            flights_data = fetch_flights(city_id, depart_date.isoformat())
-            display_flights(flights_data)
-        else:
-            st.error("Keine Flughäfen gefunden für den eingegebenen Ort.")
+    with st.form("search_form"):
+        query = st.text_input('Geben Sie einen Ort ein', 'New York')
+        depart_date = st.date_input("Wählen Sie das Abflugdatum", min_value=date.today())
+        submitted = st.form_submit_button("Flüge suchen")
+        
+        if submitted:
+            autocomplete_data = fetch_autocomplete_data(query)
+            if 'data' in autocomplete_data and any(item["navigation"]["entityType"] == "AIRPORT" for item in autocomplete_data['data']):
+                city_id = autocomplete_data['data'][0]['navigation']['id']  # Assumes the first airport ID corresponds to the city
+                flights_data = fetch_flights(city_id, depart_date.isoformat())
+                display_flights(flights_data)
+            else:
+                st.error("Keine Flughäfen gefunden für den eingegebenen Ort.")
 
 if __name__ == "__main__":
     main()
