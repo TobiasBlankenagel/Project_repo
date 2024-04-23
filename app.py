@@ -77,8 +77,8 @@ def fetch_all_flights():
 
 
 # entityid codes auflisten
-def fetch_geo_data(locale='de-DE'):
-    url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
+def fetch_geo_data(locale):
+    url = f"GET https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
     headers = {
         "Accept": "application/json",
         "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  
