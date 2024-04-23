@@ -84,8 +84,7 @@ def main():
             autocomplete_data = fetch_autocomplete_data(query)
             st.write("API response data:")
             st.json(autocomplete_data)
-            display_autocomplete_results(autocomplete_data)
-            save_airports(autocomplete_data)
+            process_and_save_autocomplete_data(autocomplete_data)  # Using the new merged function
 
     if st.button("Find Flights from Saved Airports"):
         fetch_all_flights()
