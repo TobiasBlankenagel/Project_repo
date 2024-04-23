@@ -60,7 +60,7 @@ def fetch_all_flights():
         destinations = []
         for airport in st.session_state['airports']:
             flight_data = fetch_flights(airport['id'], st.session_state['depart_date'].isoformat())
-            st.write(fetch_flights(airport['id']))
+            st.write(flight_data)
             if flight_data:
                 flights_info.append(flight_data)
                 for result in flight_data['data']['everywhereDestination']['results']:
