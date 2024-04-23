@@ -80,9 +80,9 @@ def main():
         st.session_state['airports'] = []
 
     with st.form("search_form"):
-        query = st.text_input('Enter a location', 'New York')
+        query = st.text_input('Enter a location', '')
         depart_date = st.date_input("Choose departure date for all flights", min_value=date.today())
-        submitted = st.form_submit_button("Display and Save Data")
+        submitted = st.form_submit_button("Magische Suche")
 
         if submitted:
             st.session_state['depart_date'] = depart_date  # Save the departure date
@@ -90,9 +90,8 @@ def main():
             st.write("API response data:")
             st.json(autocomplete_data)
             process_and_save_autocomplete_data(autocomplete_data)  # Using the new merged function
-
-    if st.button("Find Flights from Saved Airports"):
-        fetch_all_flights()
+            fetch_all_flights()
+        
 
 if __name__ == "__main__":
     main()
