@@ -79,11 +79,7 @@ def fetch_all_flights():
 # entityid codes auflisten
 def fetch_geo_data(locale):
     url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
-    headers = {
-        "Accept": "application/json",
-        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Your API key
-    }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url)
     
     if response.status_code == 401:
         st.error("Unauthorized. Check your API key and permissions.")
