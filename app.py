@@ -13,10 +13,10 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json() if response.status_code == 200 else None
 
-def fetch_flights(from_id, depart_date):
+def fetch_flights(depart_date):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-one-way"
     querystring = {
-        "fromId": from_id,
+        "fromId": 'eyJzIjoiVFlPQSIsImUiOiIyNzU0MjA4OSIsImgiOiIyNzU0MjA4OSIsInAiOiJDSVRZIn0=',
         "departDate": depart_date.strftime('%Y-%m-%d'),
         "adults": "1",
         "currency": "USD",
@@ -30,10 +30,10 @@ def fetch_flights(from_id, depart_date):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json() if response.status_code == 200 else None
 
-def fetch_everywhere_flights(from_id, depart_date):
+def fetch_everywhere_flights(depart_date):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-everywhere"
     querystring = {
-        "fromId": from_id,
+        "fromId": 'eyJzIjoiVFlPQSIsImUiOiIyNzU0MjA4OSIsImgiOiIyNzU0MjA4OSIsInAiOiJDSVRZIn0=',
         "departDate": depart_date.strftime('%Y-%m-%d'),
         "adults": "1",
         "currency": "USD",
