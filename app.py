@@ -13,22 +13,10 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-def display_airports(data):
-    if 'data' in data:
-        airports = [item for item in data['data'] if item["navigation"]["entityType"] == "AIRPORT"]
-        if airports:
-            st.write("Wählen Sie einen Flughafen aus der Liste:")
-            option = st.selectbox('Flughäfen:', airports, format_func=lambda x: f"{x['presentation']['title']} ({x['navigation']['localizedName']})")
-            return option
-        else:
-            st.error("Keine Flughäfen gefunden.")
-    else:
-        st.error("Keine Daten gefunden.")
-
-def fetch_flights(from_id, depart_date):
+def fetch_flights(city_id, depart_date):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-everywhere"
     querystring = {
-        "fromId": from_id,
+        "fromId": city_id,
         "departDate": depart_date,
         "adults": "1",
         "currency": "USD",
@@ -46,22 +34,6 @@ def fetch_flights(from_id, depart_date):
         st.error(f"Fehler bei der Flugabfrage: {response.status_code} - {response.text}")
         return None
 
-def fetch_flight_details(itinerary_id, token):
-    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/detail"
-    querystring = {
-        "itineraryId": itinerary_id,
-        "token": token,
-        "currency": "USD",
-        "market": "US",
-        "locale": "en-US"
-    }
-    headers = {
-        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
-        "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    return response.json() if response.status_code == 200 else None
-
 def display_flights(flights_data):
     if flights_data:
         st.write("Gesamte Antwortdaten von der API:")
@@ -70,13 +42,8 @@ def display_flights(flights_data):
         if 'data' in flights_data and flights_data['data'].get('everywhereDestination'):
             flights = flights_data['data']['everywhereDestination']['results']
             if flights:
-                flight_details = []
-                for flight in flights[:5]:  # Get details for the first five flights
-                    details = fetch_flight_details(flight["content"]["location"]["id"], flights_data["token"])
-                    if details:
-                        flight_details.append(details)
-                df = pd.DataFrame(flight_details)
-                st.write("Detailierte Fluginformationen:")
+                df = pd.DataFrame(flights)
+                st.write("Nächste Flüge vom ausgewählten Ort:")
                 st.dataframe(df)
             else:
                 st.error("Keine Flüge gefunden.")
@@ -86,15 +53,18 @@ def display_flights(flights_data):
         st.error("Keine Antwortdaten erhalten.")
 
 def main():
-    st.title('Auto-Complete Suche für Flughäfen und Flüge')
-    query = st.text_input('Geben Sie einen Flughafen ein', 'New York')
-    if st.button('Flughafen suchen'):
+    st.title('Auto-Complete Suche für Flüge von einem Ort')
+    depart_date = st.date_input("Wählen Sie das Abflugdatum", min_value=date.today())
+    query = st.text_input('Geben Sie einen Ort ein', 'New York')
+
+    if st.button('Flüge suchen'):
         autocomplete_data = fetch_autocomplete_data(query)
-        selected_airport = display_airports(autocomplete_data)
-        if selected_airport:
-            depart_date = st.date_input("Wählen Sie das Abflugdatum", min_value=date.today())
-            flights_data = fetch_flights(selected_airport["id"], depart_date.isoformat())
+        if 'data' in autocomplete_data and any(item["navigation"]["entityType"] == "AIRPORT" for item in autocomplete_data['data']):
+            city_id = autocomplete_data['data'][0]['navigation']['id']  # Assumes the first airport ID corresponds to the city
+            flights_data = fetch_flights(city_id, depart_date.isoformat())
             display_flights(flights_data)
+        else:
+            st.error("Keine Flughäfen gefunden für den eingegebenen Ort.")
 
 if __name__ == "__main__":
     main()
