@@ -15,11 +15,17 @@ def fetch_airport_data(query):
         return {"error": f"API returned a status code {response.status_code}: {response.text}"}
 
 def extract_short_names(results):
-    # Sicherstellen, dass die notwendigen Schlüssel vorhanden sind und vermeiden von IndexError
+    short_names = []  # Eine leere Liste, um die gesammelten Namen zu speichern
+    # Zuerst prüfen wir, ob 'data' im Ergebnis vorhanden ist und ob es mindestens ein Element enthält
     if 'data' in results and len(results['data']) > 0 and 'children' in results['data'][0]:
-        return [child['shortName'] for child in results['data'][0]['children']]
-    else:
-        return []
+        # Durchlaufen jedes Kind-Elements in 'children' des ersten 'data'-Elements
+        for child in results['data'][0]['children']:
+            # Prüfen, ob 'shortName' im Kind-Element existiert, um Fehler zu vermeiden
+            if 'shortName' in child:
+                # Hinzufügen des 'shortName' zum Ergebnis-Array
+                short_names.append(child['shortName'])
+    return short_names
+
 
 def main():
     st.title('Airport Information Search')
