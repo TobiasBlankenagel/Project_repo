@@ -7,7 +7,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "US", "locale": "en-US"}
     headers = {
-        "X-RapidAPI-Key": "YOUR_API_KEY",
+        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
@@ -36,7 +36,7 @@ def fetch_flights(from_id, depart_date):
         "locale": "en-US"
     }
     headers = {
-        "X-RapidAPI-Key": "YOUR_API_KEY",
+        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
