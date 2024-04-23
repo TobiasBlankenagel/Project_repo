@@ -10,26 +10,33 @@ def fetch_autocomplete_data(query):
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
-    return response.json() if response.status_code == 200 else None
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
 def display_results(data):
-    if data and 'Places' in data:
-        places = data['Places']
-        df = pd.DataFrame(places)
+    if data and 'data' in data:
+        items = data['data']
+        df = pd.DataFrame.from_records([{
+            "Title": item["presentation"]["title"],
+            "Suggestion Title": item["presentation"]["suggestionTitle"],
+            "Subtitle": item["presentation"]["subtitle"],
+            "Localized Name": item["navigation"]["localizedName"],
+            "Entity Type": item["navigation"]["entityType"],
+            "Entity ID": item["navigation"]["entityId"]
+        } for item in items])
         st.table(df)
     else:
-        st.error("Keine Ergebnisse gefunden oder Fehler bei der API-Anfrage.")
+        st.error("Keine Ergebnisse gefunden.")
 
 def main():
-    st.title('Flughafen Auto-Complete Suche')
-    query = st.text_input('Geben Sie einen Suchbegriff ein (z.B. "New York")')
+    st.title('Auto-Complete Suche für Flughäfen und Städte')
+    query = st.text_input('Geben Sie einen Standort ein', 'New York')
 
-    if query:
+    if st.button('Suche'):
         result = fetch_autocomplete_data(query)
-        if result:
-            display_results(result)
-        else:
-            st.error("Fehler bei der Anfrage. Bitte überprüfen Sie Ihre Eingabe oder versuchen Sie es später erneut.")
+        display_results(result)
 
 if __name__ == "__main__":
     main()
