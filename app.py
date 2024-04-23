@@ -124,7 +124,7 @@ def main():
 
     if st.button("Fetch Geo Data"):
         locale = 'de-DE'
-        fetch_geo_data(locale)
+        fetch_geo_data()
 
     if 'airports' not in st.session_state:
         st.session_state['airports'] = []
