@@ -26,7 +26,7 @@ def display_airports(data):
         st.error("Keine Daten gefunden.")
 
 def fetch_flights(from_id, depart_date):
-    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-one-way"
+    url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/search-everywhere"
     querystring = {
         "fromId": from_id,
         "departDate": depart_date,
