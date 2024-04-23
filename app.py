@@ -76,6 +76,26 @@ def fetch_all_flights():
         st.error("No saved airports or date. Please save airports and select a date.")
 
 
+# entityid codes auflisten
+def fetch_geo_data(locale='de-DE'):
+    url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
+    headers = {
+        "Accept": "application/json",
+        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        if 'places' in data:
+            st.write("Geographical Locations (Entity IDs and Names):")
+            for place in data['places']:
+                st.write(f"Entity ID: {place['entityId']}, Name: {place['name']}")
+        else:
+            st.write("No places found.")
+    else:
+        st.write("Failed to fetch data.")
+
+
 # Funktion, um herauszufinden an welchen Ort die Flüge fliegen
 def display_destinations(destinations):
     if destinations:
