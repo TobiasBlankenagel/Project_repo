@@ -81,7 +81,7 @@ def fetch_geo_data(locale):
     url = f"https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/{locale}"
     headers = {
         "Accept": "application/json",
-        "x-api-key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a"  # Corrected header parameter name
+        "x-api-key": "API Key"  # Corrected header parameter name
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
