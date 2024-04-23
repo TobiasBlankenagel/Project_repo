@@ -27,8 +27,22 @@ def display_autocomplete_results(data):
     else:
         st.error("Keine Daten gefunden oder unerwartete Antwortstruktur.")
 
+def save_airports(data):
+    if 'data' in data:
+        airports = [{'id': item['id'], 'title': item['presentation']['title'], 'entity_id': item['navigation']['entityId']} for item in data['data'] if item['navigation']['entityType'] == 'AIRPORT']
+        if airports:
+            st.session_state['airports'] = airports
+            st.write("Flughäfen gespeichert!")
+        else:
+            st.write("Keine Flughäfen zum Speichern gefunden.")
+    else:
+        st.error("Keine Daten zum Speichern verfügbar.")
+
 def main():
     st.title('Auto-Complete Suche für Flüge von einem Ort')
+    if 'airports' not in st.session_state:
+        st.session_state['airports'] = []
+
     with st.form("search_form"):
         query = st.text_input('Geben Sie einen Ort ein', 'New York')
         depart_date = st.date_input("Wählen Sie das Abflugdatum", min_value=date.today())
@@ -39,6 +53,14 @@ def main():
             st.write("API-Antwortdaten:")
             st.json(autocomplete_data)  # Zeigt die gesamte JSON-Antwort an
             display_autocomplete_results(autocomplete_data)
+            save_airports(autocomplete_data)
+
+    if st.button("Gespeicherte Flughäfen anzeigen"):
+        if st.session_state['airports']:
+            for airport in st.session_state['airports']:
+                st.write(f"{airport['title']} (ID: {airport['id']}, Entity ID: {airport['entity_id']})")
+        else:
+            st.write("Keine Flughäfen gespeichert.")
 
 if __name__ == "__main__":
     main()
