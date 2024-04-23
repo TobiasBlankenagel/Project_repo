@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import pandas as pd
 
+# Verbindung
+
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "US", "locale": "en-US"}
@@ -14,9 +16,17 @@ def fetch_autocomplete_data(query):
         return response.json()
     else:
         return None
+    
+# Daten zur Eingabe finden
 
 def display_results(data):
     if data and 'data' in data:
+
+        data = raw_response.json()
+        st.write("Gesamte Antwortdaten:")
+        st.json(data)  # Zeigt die gesamten JSON-Daten in einer ansprechbaren Form an
+
+        
         items = data['data']
         df = pd.DataFrame.from_records([{
             "Title": item["presentation"]["title"],
@@ -30,6 +40,8 @@ def display_results(data):
         st.table(df)
     else:
         st.error("Keine Ergebnisse gefunden.")
+
+# Eingabefeld
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Städte')
