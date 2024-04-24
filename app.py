@@ -47,9 +47,10 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
-            # st.json(data)
+            st.json(data)
             # Filter out domestic flights
             country_code = data[0]['departure']['country']['code']
+            st.json(country_code)
             international_flights = [flight for flight in data if flight['departure']['country']['code'] != country_code]
             flights_data.extend(international_flights)
     return flights_data
