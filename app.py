@@ -13,6 +13,16 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
+# Extrahiert Länder aus den Autocomplete-Daten
+def extract_countries(data):
+    countries = set()
+    if data and 'data' in data:
+        for item in data['data']:
+            if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
+                country = item['presentation']['subtitle'].split(",")[-1].strip()
+                countries.add(country)
+    return sorted(list(countries))
+
 # Sammelt Flughafeninformationen nach Land
 def process_and_collect_locations(data, country_choice):
     location_info = []
@@ -51,23 +61,25 @@ def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
 
     query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
-    country_choice = st.text_input('Geben Sie das Land ein, z.B. United Kingdom', '')
     departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
 
-    if st.button("Suche starten"):
+    if query:
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data:
-            location_info = process_and_collect_locations(autocomplete_data, country_choice)
-            if location_info:
-                iata_codes = [info[1] for info in location_info]
-                flights_data = fetch_flights(departure_date.isoformat(), iata_codes)
-                if flights_data:
-                    st.write("Internationale Flüge gefunden:")
-                    st.json(flights_data)
+            countries = extract_countries(autocomplete_data)
+            country_choice = st.selectbox('Wählen Sie ein Land aus', countries)
+            if st.button("Suche starten"):
+                location_info = process_and_collect_locations(autocomplete_data, country_choice)
+                if location_info:
+                    iata_codes = [info[1] for info in location_info]
+                    flights_data = fetch_flights(departure_date.isoformat(), iata_codes)
+                    if flights_data:
+                        st.write("Internationale Flüge gefunden:")
+                        st.json(flights_data)
+                    else:
+                        st.write("Keine internationalen Flüge gefunden.")
                 else:
-                    st.write("Keine internationalen Flüge gefunden.")
-            else:
-                st.write("Keine Flughäfen im gewählten Land gefunden.")
+                    st.write("Keine Flughäfen im gewählten Land gefunden.")
         else:
             st.error("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
 
