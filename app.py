@@ -14,21 +14,15 @@ def fetch_autocomplete_data(query):
     return response.json()
 
 # Speichert die gefundenen Airports ab und zeigt nur die EntityIDs an
-def process_and_display_entity_ids(data):
+def process_and_collect_countries(data):
     if data and 'data' in data:
         countries = set()
         for item in data['data']:
             if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
                 country = item['presentation']['subtitle']
                 countries.add(country)
-
-        if len(countries) > 1:
-            country_selected = st.selectbox("Wählen Sie ein Land:", list(countries))
-            display_airports_by_country(data, country_selected)
-        elif countries:
-            display_airports_by_country(data, list(countries)[0])
-    else:
-        st.error("Keine Daten gefunden oder unerwartete Antwortstruktur.")
+        return list(countries)
+    return []
 
 # Zeigt die Flughäfen an, die zu dem ausgewählten Land gehören
 def display_airports_by_country(data, country_selected):
@@ -42,22 +36,28 @@ def display_airports_by_country(data, country_selected):
                 name = item['presentation']['title']
                 st.write(f"{name}: IATA = {IATA_id}")
                 iata_codes.append(IATA_id)
-    st.session_state['iata_codes'] = iata_codes
+    if iata_codes:
+        st.session_state['iata_codes'] = iata_codes
 
 # Hauptfunktion zum Laufen auf Streamlit
 def main():
     st.title('Auto-Complete Suche für Flughäfen')
 
-    with st.form("search_form"):
-        query = st.text_input('Geben Sie einen Standort ein', '')
-        submitted = st.form_submit_button("Suche")
-
-        if submitted and query:
-            autocomplete_data = fetch_autocomplete_data(query)
-            if autocomplete_data:
-                process_and_display_entity_ids(autocomplete_data)
+    query = st.text_input('Geben Sie einen Standort ein', '')
+    if st.button("Suche"):
+        autocomplete_data = fetch_autocomplete_data(query)
+        if autocomplete_data:
+            countries = process_and_collect_countries(autocomplete_data)
+            if countries:
+                st.session_state['autocomplete_data'] = autocomplete_data
+                country_selected = st.selectbox("Wählen Sie ein Land:", countries)
+                st.session_state['country_selected'] = country_selected
+                if st.button("Land bestätigen"):
+                    display_airports_by_country(st.session_state['autocomplete_data'], st.session_state['country_selected'])
             else:
-                st.write("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
+                st.write("Keine Flughäfen gefunden.")
+        else:
+            st.error("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
 
 if __name__ == "__main__":
     main()
