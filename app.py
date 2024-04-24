@@ -7,43 +7,39 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "US", "locale": "en-US"}
     headers = {
-        "X-RapidAPI-Key": "Hier-deinen-eigenen-RapidAPI-Key-einfügen",
+        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-# Verarbeitet und speichert Autocomplete-Daten, prüft auf Flughafentyp
-def process_and_display_autocomplete_data(data):
+# Speichert die gefundenen Airports ab und zeigt nur die EntityIDs an
+def process_and_display_entity_ids(data):
     if data and 'data' in data:
-        st.write("Gefundene Flughäfen:")
-        airports = []
+        st.write("Gefundene Flughäfen und deren Entity IDs:")
         for item in data['data']:
             if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
-                sky_id = item['navigation']['relevantFlightParams']['skyId']
+                entity_id = item['navigation']['entityId']
                 name = item['presentation']['title']
                 subtitle = item['presentation']['subtitle']
-                st.write(f"{name} ({sky_id}) - {subtitle}")
-                airports.append({'sky_id': sky_id, 'name': name})
-        if airports:
-            st.session_state['airports'] = airports
-        else:
-            st.write("Keine Flughäfen gefunden.")
+                st.write(f"{name} - {subtitle}: Entity ID = {entity_id}")
     else:
         st.error("Keine Daten gefunden oder unerwartete Antwortstruktur.")
 
 # Hauptfunktion zum Laufen auf Streamlit
 def main():
-    st.title('Flughafen Auto-Complete Suche und Fluginformationen')
+    st.title('Auto-Complete Suche für Flughäfen')
 
-    query = st.text_input('Geben Sie einen Standort ein', '')
-    if st.button("Suche"):
-        autocomplete_data = fetch_autocomplete_data(query)
-        if autocomplete_data:
-            process_and_display_autocomplete_data(autocomplete_data)
-        else:
-            st.write("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
+    with st.form("search_form"):
+        query = st.text_input('Geben Sie einen Standort ein', '')
+        submitted = st.form_submit_button("Suche")
+
+        if submitted and query:
+            autocomplete_data = fetch_autocomplete_data(query)
+            if autocomplete_data:
+                process_and_display_entity_ids(autocomplete_data)
+            else:
+                st.write("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
 
 if __name__ == "__main__":
     main()
-
