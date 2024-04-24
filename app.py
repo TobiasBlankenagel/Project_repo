@@ -5,13 +5,25 @@ from datetime import date
 # Autocomplete Suchleiste für Nutzer
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
-    querystring = {"query": query, "market": "US", "locale": "en-US"}
+    querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
         "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
+
+# Fetch airport details like latitude and longitude using IATA code
+def get_airport_details(iata_code):
+    url = f"https://aviation-reference-data.p.rapidapi.com/airports/{iata_code}"
+    headers = {
+        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
+        "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    return None
 
 # Sammelt Flughafeninformationen nach Land
 def process_and_collect_locations(data, country_choice):
@@ -68,13 +80,21 @@ def main():
             departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
             if st.button("Suche starten"):
                 location_info = process_and_collect_locations(autocomplete_data, country_choice)
-                for location in location_info:
-                    st.write(location)
                 if location_info:
                     flights_data = fetch_flights(departure_date.isoformat(), location_info)
                     if flights_data:
                         st.write("Internationale Flüge gefunden:")
-                        st.write(flights_data)
+                        airports_details = []
+                        for flight in flights_data:
+                            iata_code = flight['arrival']['airport']['iata']
+                            airport_data = get_airport_details(iata_code)
+                            if airport_data:
+                                airports_details.append({
+                                    "IATA": iata_code,
+                                    "Latitude": airport_data['latitude'],
+                                    "Longitude": airport_data['longitude']
+                                })
+                        st.write(airports_details)
                     else:
                         st.write("Keine internationalen Flüge gefunden.")
                 else:
