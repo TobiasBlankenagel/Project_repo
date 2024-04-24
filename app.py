@@ -50,6 +50,7 @@ def fetch_flights(departure_date, locations):
             # st.json(data)
             # Filter out domestic flights
             country_code = data[0]['departure']['country']['code']
+            st.json(country_code) 
             international_flights = [flight for flight in data if flight['departure']['country']['code'] != country_code]
             flights_data.extend(international_flights)
     return flights_data
