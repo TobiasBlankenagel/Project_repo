@@ -67,9 +67,26 @@ def fetch_flights(departure_date, locations):
                     flights_data.append(flight)
     return flights_data
 
+# Fetch weather information based on latitude and longitude
+def get_weather(lat, lon):
+    url = "https://yahoo-weather5.p.rapidapi.com/weather"
+    querystring = {"lat":lat, "long":lon, "format":"json", "u":"c"}
+    headers = {
+        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
+        "X-RapidAPI-Host": "yahoo-weather5.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    if response.status_code == 200:
+        weather = response.json()
+        temperature = weather['current_observation']['condition']['temperature']
+        condition = weather['current_observation']['condition']['text']
+        return {"Temperature": temperature, "Condition": condition}
+    return None
+
+
 # Hauptfunktion zum Laufen auf Streamlit
 def main():
-    st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
+    st.title('Auto-Complete Suche für Flughäfen, Flugdatenabfrage und Wetterinformationen')
 
     query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
     if query:
@@ -89,10 +106,14 @@ def main():
                             iata_code = flight['arrival']['airport']['iata']
                             airport_data = get_airport_details(iata_code)
                             if airport_data:
+                                latitude = airport_data['latitude']
+                                longitude = airport_data['longitude']
+                                weather = get_weather(latitude, longitude)
                                 airports_details.append({
                                     "IATA": iata_code,
-                                    "Latitude": airport_data['latitude'],
-                                    "Longitude": airport_data['longitude']
+                                    "Latitude": latitude,
+                                    "Longitude": longitude,
+                                    "Weather": weather
                                 })
                         st.write(airports_details)
                     else:
