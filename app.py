@@ -7,7 +7,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "US", "locale": "en-US"}
     headers = {
-        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
+        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
@@ -28,7 +28,7 @@ def fetch_flights(departure_date, locations):
     flights_data = []
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
-        "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
+        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
@@ -47,10 +47,9 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
-            st.json(data)
+            # st.json(data)
             # Filter out domestic flights
             country_code = data[0]['departure']['country']['code']
-            st.write(country_code)
             international_flights = [flight for flight in data if flight['departure']['country']['code'] != country_code]
             flights_data.extend(international_flights)
     return flights_data
