@@ -31,10 +31,10 @@ def fetch_flights(departure_date, locations):
         "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
-    
+
     # Ausgabe der JSON-Datei für location_info
-    st.write("JSON-Datei für location_info:")
-    st.json(locations)
+   #st.write("JSON-Datei für location_info:")
+   #st.json(locations) # hier wird eine Liste von IATA-Codes ausgegeben
     
     for iata_code in locations:
         querystring = {
@@ -47,8 +47,10 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
+            # st.json(data)
             # Filter out domestic flights
-            international_flights = [flight for flight in data if flight['arrival']['country']['code'] != country_code]
+            country_code = data[0]['departure']['country']['code']
+            international_flights = [flight for flight in data if flight['departure']['country']['code'] != country_code]
             flights_data.extend(international_flights)
     return flights_data
 
