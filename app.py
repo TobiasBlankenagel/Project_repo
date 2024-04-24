@@ -68,7 +68,8 @@ def main():
             departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
             if st.button("Suche starten"):
                 location_info = process_and_collect_locations(autocomplete_data, country_choice)
-                st.json(location_info)
+                for location in location_info:
+                    st.write(location)
                 if location_info:
                     flights_data = fetch_flights(departure_date.isoformat(), location_info)
                     if flights_data:
