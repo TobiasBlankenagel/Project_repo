@@ -50,9 +50,9 @@ def fetch_flights(departure_date, locations):
             # st.json(data)
             # Filter out domestic flights
             country_code = data[0]['departure']['country']['code']
-            st.write(country_code) 
-            international_flights = [flight for flight in data if flight['departure']['country']['code'] != country_code]
-            flights_data.extend(international_flights)
+            for flight in data:
+                if flight['departure']['country']['code'] != country_code:
+                    flights_data.append(flight['arrival']['airport']['iata'])
     return flights_data
 
 # Hauptfunktion zum Laufen auf Streamlit
@@ -72,7 +72,7 @@ def main():
                     flights_data = fetch_flights(departure_date.isoformat(), location_info)
                     if flights_data:
                         st.write("Internationale Flüge gefunden:")
-                        st.json(flights_data)
+                        st.write(flights_data)
                     else:
                         st.write("Keine internationalen Flüge gefunden.")
                 else:
