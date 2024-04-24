@@ -51,7 +51,7 @@ def fetch_flights(departure_date, locations):
             # Filter out domestic flights
             country_code = data[0]['departure']['country']['code']
             for flight in data:
-                if flight['arrival']['country']['code'] == country_code:
+                if flight['arrival']['country']['code'] != country_code:
                     flights_data.append(flight)
     return flights_data
 
