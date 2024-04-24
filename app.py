@@ -19,10 +19,10 @@ def process_and_display_entity_ids(data):
         st.write("Gefundene Flughäfen und deren Entity IDs:")
         for item in data['data']:
             if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
-                entity_id = item['navigation']['entityId']
+                IATA_id = item['navigation']['relevantFlightParams']['skyId']
                 name = item['presentation']['title']
                 subtitle = item['presentation']['subtitle']
-                st.write(f"{name} - {subtitle}: Entity ID = {entity_id}")
+                st.write(f"{name} - {subtitle}: IATA = {IATA_id}")
     else:
         st.error("Keine Daten gefunden oder unerwartete Antwortstruktur.")
 
