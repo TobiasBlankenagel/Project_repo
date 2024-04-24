@@ -13,25 +13,14 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-# Extrahiert Länder aus den Autocomplete-Daten
-def extract_countries(data):
-    countries = set()
-    if data and 'data' in data:
-        for item in data['data']:
-            if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
-                country = item['presentation']['subtitle'].split(",")[-1].strip()
-                countries.add(country)
-    return sorted(list(countries))
-
 # Sammelt Flughafeninformationen nach Land
 def process_and_collect_locations(data, country_choice):
     location_info = []
     if data and 'data' in data:
         for item in data['data']:
             if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'].endswith(country_choice):
-                city_country = f"{item['presentation']['title']} ({item['presentation']['subtitle']})"
                 iata_code = item['navigation']['relevantFlightParams']['skyId']
-                location_info.append((city_country, iata_code, item['presentation']['subtitle']))
+                location_info.append((iata_code))
     return location_info
 
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
@@ -42,7 +31,12 @@ def fetch_flights(departure_date, locations):
         "X-RapidAPI-Key": "20c5e19a55msh027a6942760467ap12650bjsne0765678bd0a",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
-    for city_country, iata_code, departure_country in locations:
+    
+    # Ausgabe der JSON-Datei für location_info
+    st.write("JSON-Datei für location_info:")
+    st.json(locations)
+    
+    for iata_code in locations:
         querystring = {
             "version": "v2",
             "DepartureDateTime": departure_date,
@@ -54,7 +48,7 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             # Filter out domestic flights
-            international_flights = [flight for flight in data if flight['arrival']['country']['code'] != departure_country]
+            international_flights = [flight for flight in data if flight['arrival']['country']['code'] != country_code]
             flights_data.extend(international_flights)
     return flights_data
 
@@ -66,7 +60,7 @@ def main():
     if query:
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data:
-            countries = extract_countries(autocomplete_data)
+            countries = sorted({item['presentation']['subtitle'].split(',')[-1].strip() for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT'})
             country_choice = st.selectbox('Wählen Sie ein Land aus', countries)
             departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
             if st.button("Suche starten"):
