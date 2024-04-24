@@ -13,6 +13,17 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
+# Verarbeitet Daten und sammelt Flughafeninformationen
+def process_and_collect_locations(data):
+    location_info = []
+    if data and 'data' in data:
+        for item in data['data']:
+            if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
+                city_country = f"{item['presentation']['title']} ({item['presentation']['subtitle']})"
+                iata_code = item['navigation']['relevantFlightParams']['skyId']
+                location_info.append((city_country, iata_code))
+    return location_info
+
 # Abfrage der Flugdaten für ein bestimmtes Datum und einen IATA-Code
 def fetch_flights(departure_date, iata_code):
     url = "https://flight-info-api.p.rapidapi.com/schedules"
