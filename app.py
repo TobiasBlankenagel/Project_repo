@@ -47,14 +47,13 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
-            for item in data:
-                st.write(item)
             # st.json(data)
             # Filter out domestic flights
             country_code = data[0]['departure']['country']['code']
             for flight in data:
                 if flight['departure']['country']['code'] != country_code:
-                    flights_data.append(flight['arrival']['airport']['iata'])
+                    flights_data.append(flight)
+            st.write(flights_data)
     return flights_data
 
 # Hauptfunktion zum Laufen auf Streamlit
