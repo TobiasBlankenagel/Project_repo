@@ -13,16 +13,16 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-# Speichert die gefundenen Airports ab und zeigt nur die EntityIDs an
+# Verarbeitet Daten und sammelt Flughafeninformationen
 def process_and_collect_locations(data):
-    locations = []
+    location_info = []
     if data and 'data' in data:
         for item in data['data']:
             if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
                 city_country = f"{item['presentation']['title']} ({item['presentation']['subtitle']})"
-                locations.append(city_country)
-        return locations
-    return []
+                iata_code = item['navigation']['relevantFlightParams']['skyId']
+                location_info.append((city_country, iata_code))
+    return location_info
 
 # Hauptfunktion zum Laufen auf Streamlit
 def main():
@@ -32,11 +32,17 @@ def main():
     if query:
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data:
-            locations = process_and_collect_locations(autocomplete_data)
-            if locations:
-                location_selected = st.selectbox("Wählen Sie einen Flughafen:", locations)
+            location_info = process_and_collect_locations(autocomplete_data)
+            if location_info:
+                # Erstellt eine Auswahlliste mit Flughafenname und speichert den IATA-Code
+                options = [info[0] for info in location_info]
+                index_selected = st.selectbox("Wählen Sie einen Flughafen:", options, format_func=lambda x: x)
                 if st.button("Auswahl bestätigen"):
-                    st.write(f"Sie haben {location_selected} ausgewählt.")
+                    # Findet den IATA-Code für den ausgewählten Flughafen
+                    iata_code = location_info[options.index(index_selected)][1]
+                    st.write(f"Sie haben {index_selected} ausgewählt. IATA-Code: {iata_code}")
+                    # Optional: Speichern des IATA-Codes für weitere Verwendung
+                    st.session_state['iata_code'] = iata_code
             else:
                 st.write("Keine Flughäfen gefunden.")
         else:
