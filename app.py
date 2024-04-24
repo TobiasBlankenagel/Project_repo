@@ -13,17 +13,6 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-# Verarbeitet Daten und sammelt Flughafeninformationen
-def process_and_collect_locations(data):
-    location_info = []
-    if data and 'data' in data:
-        for item in data['data']:
-            if 'navigation' in item and item['navigation']['entityType'] == 'AIRPORT':
-                city_country = f"{item['presentation']['title']} ({item['presentation']['subtitle']})"
-                iata_code = item['navigation']['relevantFlightParams']['skyId']
-                location_info.append((city_country, iata_code))
-    return location_info
-
 # Abfrage der Flugdaten für ein bestimmtes Datum und einen IATA-Code
 def fetch_flights(departure_date, iata_code):
     url = "https://flight-info-api.p.rapidapi.com/schedules"
@@ -40,9 +29,19 @@ def fetch_flights(departure_date, iata_code):
     }
     response = requests.get(url, headers=headers, params=querystring)
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        return filter_international_flights(data)
     else:
         return {"error": "Unable to fetch data", "status_code": response.status_code}
+
+# Filtert internationale Flüge basierend auf dem Country-Code
+def filter_international_flights(flight_data):
+    if 'data' in flight_data and flight_data['data']:
+        departure_country_code = flight_data['data'][0]['departure']['country']['code']
+        international_flights = [flight for flight in flight_data['data']
+                                 if flight['arrival']['country']['code'] != departure_country_code]
+        return {"data": international_flights}
+    return {"data": []}
 
 # Hauptfunktion zum Laufen auf Streamlit
 def main():
@@ -62,7 +61,10 @@ def main():
                     iata_code = location_info[options.index(index_selected)][1]
                     st.write(f"Sie haben {index_selected} ausgewählt. IATA-Code: {iata_code}")
                     flights_data = fetch_flights(departure_date.isoformat(), iata_code)
-                    st.json(flights_data)
+                    if 'data' in flights_data:
+                        st.json(flights_data)
+                    else:
+                        st.write("Keine internationalen Flüge gefunden.")
             else:
                 st.write("Keine Flughäfen gefunden.")
         else:
