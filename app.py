@@ -150,7 +150,7 @@ def main():
                     city_name = get_city_by_coordinates(airport_info['latitude'], airport_info['longitude'])
                     weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
                     airports_details.append({
-                        "Destination": airport_info['name'],
+                        "Destination": city_name,
                         "IATA": flight['arrival']['airport']['iata'],
                         "Departure Time (local)": flight['departure']['time']['local'],
                         "Latitude": airport_info['latitude'],
@@ -163,7 +163,7 @@ def main():
             if filtered_flights:
                 st.write("Gefilterte Flüge gefunden:")
                 for flight in filtered_flights:
-                    with st.expander(f"Flug nach {city_name} (IATA: {flight['IATA']})"):
+                    with st.expander(f"Flug nach {flight['Destination']} (IATA: {flight['IATA']})"):
                         st.write(f"Abflugzeit (lokal): {flight['Departure Time (local)']}")
                         st.write(f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}")
                         st.write(f"Wetter: {flight['Weather Condition']} bei {flight['Temperature (C)']} °C")
