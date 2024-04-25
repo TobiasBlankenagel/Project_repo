@@ -109,7 +109,7 @@ def display_flight_details(flight_id):
 
 def get_city_by_coordinates(lat, lon):
     url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
-    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "0"}
+    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
     headers = {
         "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
