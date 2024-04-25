@@ -74,7 +74,7 @@ def main():
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
-            location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'].ends_with(country_choice)]
+            location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'].endswith(country_choice)]
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
             if flights_data:
                 st.write("Internationale Flüge gefunden:")
