@@ -60,7 +60,7 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             for flight in data:
-                departure_time_utc = flight['departure']['date']['utc']
+                departure_time_utc = flight['departure']['time']['utc']
                 if departure_time_utc not in departure_times:  # Überprüfen, ob die Zeit schon vorhanden ist
                     if flight['arrival']['country']['code'] != flight['departure']['country']['code']:
                         flights_data.append(flight)
