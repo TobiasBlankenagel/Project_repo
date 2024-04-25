@@ -106,7 +106,7 @@ def main():
                         airports_details.append({
                             "Destination": airport_info['name'],
                             "IATA": flight['arrival']['airport']['iata'],
-                            "Departure Time (UTC)": flight['departure']['date']['utc'],
+                            "Departure Time (UTC)": flight['departure']['time']['utc'],
                             "Latitude": airport_info['latitude'],
                             "Longitude": airport_info['longitude']
                         })
