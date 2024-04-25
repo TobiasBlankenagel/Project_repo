@@ -15,6 +15,7 @@ def fetch_autocomplete_data(query):
     # Eine kurze Verzögerung einführen, um weniger bot-artig zu wirken
     time.sleep(1)  # Eine Sekunde warten
     response = requests.get(url, headers=headers, params=querystring)
+    st.json(response)
     return response.json()
 
 
@@ -109,8 +110,8 @@ def main():
     st.title('Suche dein Ferienerlebnis!')
     query = st.text_input('Gib einen Standort ein', '')
     departure_date = st.date_input('Wähl ein Abflugdatum', min_value=date.today())
-    temp_min = st.number_input('Minimale Temperatur (°C)', format="%d", step=1)
-    temp_max = st.number_input('Maximale Temperatur (°C)', format="%d", step=1)
+    temp_min = st.number_input('Minimale Temperatur (°C) am Ziel', format="%d", step=1)
+    temp_max = st.number_input('Maximale Temperatur (°C) am Ziel', format="%d", step=1)
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
