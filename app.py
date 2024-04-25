@@ -12,10 +12,16 @@ def fetch_autocomplete_data(query):
         "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
-    # Eine kurze Verzögerung einführen, um weniger bot-artig zu wirken
-    time.sleep(1)  # Eine Sekunde warten
+    time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
     response = requests.get(url, headers=headers, params=querystring)
-    return response.json()
+    if response.status_code == 200:
+        data = response.json()
+        if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
+            st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
+            return None
+        return data
+    st.error("Fehler beim Abrufen der Daten. Statuscode: {}".format(response.status_code))
+    return None
 
 
 # Fetch airport details like latitude and longitude using IATA code
@@ -114,7 +120,8 @@ def main():
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
-        st.json(autocomplete_data)
+        if autocomplete_data is None:
+            return 
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
