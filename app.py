@@ -11,7 +11,6 @@ def fetch_autocomplete_data(query):
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
-    st.json(response)
     return response.json()
 
 # Fetch airport details like latitude and longitude using IATA code
@@ -90,6 +89,7 @@ def main():
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
+        st.json(autocomplete_data)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = []
