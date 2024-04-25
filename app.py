@@ -74,7 +74,7 @@ def fetch_flights(departure_date, locations):
                 # Andernfalls, wenn es zur gleichen Zeit ist aber unterschiedliche Ziele hat, wird es auch hinzugefügt
                 elif all(flight_key[0] != f[0] or flight_key[1] != f[1] for f in seen_flights):
                     flights_data.append(flight)
-    st.json(flight_data)
+
     return flights_data
 
 
@@ -100,6 +100,7 @@ def main():
                     location_info.append(sky_id)
 
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
+            st.json(flights_data)
             if flights_data:
                 airports_details = []
                 for flight in flights_data:
