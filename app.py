@@ -75,14 +75,9 @@ def fetch_flights(departure_date, locations):
                 departure_time_local = flight['departure']['date']['local']
                 arrival_iata = flight['arrival']['airport']['iata']
                 flight_key = (departure_time_local, arrival_iata)
+                flights_data.append(flight)
 
-                # Prüft nur, ob die gleiche Uhrzeit zum gleichen Zielort bereits gesehen wurde
-                if flight_key not in seen_flights:
-                    flights_data.append(flight)
-                    seen_flights.add(flight_key)
-                # Andernfalls, wenn es zur gleichen Zeit ist aber unterschiedliche Ziele hat, wird es auch hinzugefügt
-                elif all(flight_key[0] != f[0] or flight_key[1] != f[1] for f in seen_flights):
-                    flights_data.append(flight)
+
 
     return flights_data
 
