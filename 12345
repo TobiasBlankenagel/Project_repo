@@ -1,3 +1,4 @@
+
 import streamlit as st
 import requests
 from datetime import date
@@ -9,7 +10,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
@@ -106,21 +107,6 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
 def display_flight_details(flight_id):
     # Diese Funktion könnte detaillierte Informationen zum ausgewählten Flug anzeigen
     st.write(f"Details für Flug {flight_id}")
-
-def get_city_by_coordinates(lat, lon):
-    url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
-    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "0"}
-    headers = {
-        "X-RapidAPI-Key": "ffcf62515fmsh41b890b8371e503p1cda22jsn67c89bfef1c7",
-        "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    if response.status_code == 200:
-        data = response.json()
-        if data:
-            return data[0].get('City', 'Unbekannte Stadt')
-    return 'Unbekannte Stadt'
-
 
 
 def main():
