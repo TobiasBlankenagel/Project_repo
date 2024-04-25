@@ -76,9 +76,9 @@ def fetch_flights(departure_date, locations):
                 departure_time_local = flight['departure']['date']['local']
                 arrival_iata = flight['arrival']['airport']['iata']
                 flight_key = (departure_time_local, arrival_iata)
-                flights_data.append(flight)
-
-
+                if flight_key not in seen_flights:  # Prüft, ob der Flug bereits gesehen wurde
+                    flights_data.append(flight)
+                    seen_flights.add(flight_key)  # Fügt den Flug zum Set der gesehenen Flüge hinzu
 
     return flights_data
 
