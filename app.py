@@ -30,7 +30,7 @@ def get_most_frequent_country(autocomplete_data):
     country_count = {}
     for item in autocomplete_data.get('data', []):
         if item['navigation']['entityType'] == 'AIRPORT':
-            country = item['presentation']['subtitle'].split(',')[-1].strip()
+            country = item['presentation']['subtitle']
             if country in country_count:
                 country_count[country] += 1
             else:
@@ -46,6 +46,11 @@ def fetch_flights(departure_date, locations):
         "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
+
+    # Ausgabe der JSON-Datei für location_info
+   #st.write("JSON-Datei für location_info:")
+   #st.json(locations) # hier wird eine Liste von IATA-Codes ausgegeben
+    
     for iata_code in locations:
         querystring = {
             "version": "v2",
@@ -57,8 +62,12 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
+            # st.json(data)
+            # Filter out domestic flights
+            country_code = data[0]['departure']['country']['code']
             for flight in data:
-                flights_data.append(flight)
+                if flight['arrival']['country']['code'] != country_code:
+                    flights_data.append(flight)
     return flights_data
 
 def main():
@@ -74,7 +83,15 @@ def main():
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
-            location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'].endswith(country_choice)]
+            location_info = []
+            for item in autocomplete_data.get('data', []):
+                # Überprüfe, ob das aktuelle Element ein Flughafen ist
+                if item['navigation']['entityType'] == 'AIRPORT':
+                    # Überprüfe, ob der Untertitel des Items mit der Länderauswahl endet
+                    if item['presentation']['subtitle'] == country_choice:
+                        # Hole die skyId und füge sie zur location_info Liste hinzu
+                        sky_id = item['navigation']['relevantFlightParams']['skyId']
+                        location_info.append(sky_id)
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
             if flights_data:
                 st.write("Internationale Flüge gefunden:")
