@@ -112,8 +112,21 @@ def display_flight_details(flight_id):
     # Diese Funktion könnte detaillierte Informationen zum ausgewählten Flug anzeigen
     st.write(f"Details für Flug {flight_id}")
 
+def get_city_by_coordinates(lat, lon):
+    url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
+    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "0"}
+    headers = {
+        "X-RapidAPI-Key": "ffcf62515fmsh41b890b8371e503p1cda22jsn67c89bfef1c7",
+        "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            return data[0].get('City', 'Unbekannte Stadt')
+    return 'Unbekannte Stadt'
 
-import streamlit as st
+
 
 def main():
     st.title('Suche dein Ferienerlebnis!')
@@ -134,10 +147,11 @@ def main():
             for flight in flights_data:
                 airport_info = get_airport_details(flight['arrival']['airport']['iata'])
                 if airport_info:
+                    city_name = get_city_by_coordinates(airport_info['latitude'], airport_info['longitude'])
                     weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
                     airports_details.append({
                         "Destination": airport_info['name'],
-                        "IATA": flight['arrival']['airport']['iata'],
+                        "IATA": city_name,
                         "Departure Time (local)": flight['departure']['time']['local'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
@@ -149,7 +163,7 @@ def main():
             if filtered_flights:
                 st.write("Gefilterte Flüge gefunden:")
                 for flight in filtered_flights:
-                    with st.expander(f"Flug von {flight['Destination']} (IATA: {flight['IATA']})"):
+                    with st.expander(f"Flug nach {flight['Destination']} (IATA: {flight['IATA']})"):
                         st.write(f"Abflugzeit (lokal): {flight['Departure Time (local)']}")
                         st.write(f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}")
                         st.write(f"Wetter: {flight['Weather Condition']} bei {flight['Temperature (C)']} °C")
