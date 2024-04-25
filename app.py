@@ -142,6 +142,7 @@ def main():
                     location_info.append(sky_id)
 
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
+            st.json(flights_data)
             if flights_data:
                 airports_details = []
                 for flight in flights_data:
