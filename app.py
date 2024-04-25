@@ -108,17 +108,21 @@ def display_flight_details(flight_id):
     st.write(f"Details für Flug {flight_id}")
 
 def get_city_by_coordinates(lat, lon):
-    url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
-    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "0"}
+    url = "https://geocodeapi.p.rapidapi.com/GetLargestCities"
+    # Erhöht den Bereich auf 30000 Meter, um die größte Stadt in der Nähe zu finden
+    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
     headers = {
-        "X-RapidAPI-Key": "ffcf62515fmsh41b890b8371e503p1cda22jsn67c89bfef1c7",
+        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
     if response.status_code == 200:
         data = response.json()
+        # Prüft, ob Daten vorhanden sind und gibt die Stadt aus dem ersten Eintrag zurück
         if data:
-            return data[0].get('City', 'Unbekannte Stadt')
+            # Angenommen, die Antwort enthält eine Liste von Städten, sortiert nach ihrer Größe
+            largest_city = data[0].get('City', 'Unbekannte Stadt')
+            return largest_city
     return 'Unbekannte Stadt'
 
 
