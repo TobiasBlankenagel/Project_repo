@@ -113,7 +113,7 @@ def get_city_by_coordinates(lat, lon):
     headers = {
         "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
-    }c
+    }
     response = requests.get(url, headers=headers, params=querystring)
     if response.status_code == 200:
         data = response.json()
