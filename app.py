@@ -87,69 +87,66 @@ def get_weather(lat, lon):
         "lat": lat,
         "lon": lon,
         "appid": "afe025cb2b8a2785c5837a3eaed7b62a",
-        "units": "metric",  # Setzt die Temperatureinheit auf Celsius
-        "lang": "de"  # Ergebnisse auf Deutsch
+        "units": "metric",
+        "lang": "de"
     }
     response = requests.get(url, params=params)
-    if response.status_code == 200:
-        weather = response.json()
-        temperature = weather['main']['temp']  # Temperatur in Celsius
-        condition = weather['weather'][0]['description']  # Wetterbeschreibung
-        return {"Temperature": temperature, "Condition": condition}
-    return None
+    return response.json() if response.status_code == 200 else None
+
+def filter_flights_by_temperature(flights_details, temp_min, temp_max):
+    return [
+        flight for flight in flights_details
+        if (temp_min is None or flight['Temperature (C)'] >= temp_min) and
+           (temp_max is None or flight['Temperature (C)'] <= temp_max)
+    ]
+
 
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
     with col2:
         departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
+    with col3:
+        temp_min = st.number_input('Minimale Temperatur (°C)', value=-100, format="%d")
+        temp_max = st.number_input('Maximale Temperatur (°C)', value=100, format="%d")
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
-        st.json(autocomplete_data)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
-            location_info = []
-
-            for item in autocomplete_data.get('data', []):
-                if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice:
-                    sky_id = item['navigation']['relevantFlightParams']['skyId']
-                    location_info.append(sky_id)
-
+            location_info = [item['navigation']['relevantFlightParams']['skyId']
+                             for item in autocomplete_data.get('data', [])
+                             if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
-            if flights_data:
-                airports_details = []
-                for flight in flights_data:
-                    airport_info = get_airport_details(flight['arrival']['airport']['iata'])
-                    if airport_info:
-                        weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
-                        # Details für jeden Flughafen sammeln
-                        airports_details.append({
-                            "Destination": airport_info['name'],
-                            "IATA": flight['arrival']['airport']['iata'],
-                            "Departure Time (UTC)": flight['departure']['date']['utc'],
-                            "Latitude": airport_info['latitude'],
-                            "Longitude": airport_info['longitude'],
-                            "Weather Condition": weather_info['Condition'] if weather_info else "No data",
-                            "Temperature (C)": weather_info['Temperature'] if weather_info else "No data"
-                        })
-
-                if airports_details:
-                    st.write("Internationale Flüge gefunden:")
-                    for airport in airports_details:
-                        st.write(f"Destination: {airport['Destination']}, IATA: {airport['IATA']}, "
-                                 f"Departure Time (UTC): {airport['Departure Time (UTC)']}, "
-                                 f"Latitude: {airport['Latitude']}, Longitude: {airport['Longitude']}, "
-                                 f"Weather Condition: {airport['Weather Condition']}, "
-                                 f"Temperature (C): {airport['Temperature (C)']}")
-                else:
-                    st.write("Details zu den Flughäfen konnten nicht abgerufen werden.")
+            airports_details = []
+            for flight in flights_data:
+                airport_info = get_airport_details(flight['arrival']['airport']['iata'])
+                if airport_info:
+                    weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
+                    airports_details.append({
+                        "Destination": airport_info['name'],
+                        "IATA": flight['arrival']['airport']['iata'],
+                        "Departure Time (UTC)": flight['departure']['date']['utc'],
+                        "Latitude": airport_info['latitude'],
+                        "Longitude": airport_info['longitude'],
+                        "Weather Condition": weather_info.get('Condition', "No data") if weather_info else "No data",
+                        "Temperature (C)": weather_info.get('Temperature') if weather_info else "No data"
+                    })
+            filtered_flights = filter_flights_by_temperature(airports_details, temp_min, temp_max)
+            if filtered_flights:
+                st.write("Gefilterte internationale Flüge gefunden:")
+                for flight in filtered_flights:
+                    st.write(f"Destination: {flight['Destination']}, IATA: {flight['IATA']}, "
+                             f"Departure Time (UTC): {flight['Departure Time (UTC)']}, "
+                             f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}, "
+                             f"Weather Condition: {flight['Weather Condition']}, "
+                             f"Temperature (C): {flight['Temperature (C)']}")
             else:
-                st.write("Keine internationalen Flüge gefunden.")
+                st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
         else:
             st.error("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
 
