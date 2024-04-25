@@ -91,6 +91,7 @@ def get_weather(lat, lon):
         "lang": "de"  # Ergebnisse auf Deutsch
     }
     response = requests.get(url, params=params)
+    st.json(response)
     if response.status_code == 200:
         weather = response.json()
         temperature = weather['main']['temp']  # Temperatur in Celsius
