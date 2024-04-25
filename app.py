@@ -3,6 +3,8 @@ import requests
 from datetime import date
 
 # Autocomplete Suchleiste für Nutzer
+import time
+
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
@@ -10,8 +12,11 @@ def fetch_autocomplete_data(query):
         "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
+    # Eine kurze Verzögerung einführen, um weniger bot-artig zu wirken
+    time.sleep(1)  # Eine Sekunde warten
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
+
 
 # Fetch airport details like latitude and longitude using IATA code
 def get_airport_details(iata_code):
