@@ -113,9 +113,9 @@ def main():
         query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
     with col2:
         departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
-with col3:
-    temp_min = st.number_input('Minimale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die minimale Temperatur ein", allow_none=True)
-    temp_max = st.number_input('Maximale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die maximale Temperatur ein", allow_none=True)
+    with col3:
+        temp_min = st.number_input('Minimale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die minimale Temperatur ein", allow_none=True)
+        temp_max = st.number_input('Maximale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die maximale Temperatur ein", allow_none=True)
 
 
     if st.button("Suche starten") and query:
