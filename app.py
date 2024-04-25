@@ -107,15 +107,10 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
-    with col2:
-        departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
-    with col3:
-        temp_min = st.number_input('Minimale Temperatur (°C)', format="%d", step=1)
-        temp_max = st.number_input('Maximale Temperatur (°C)', format="%d", step=1)
+    query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
+    departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
+    temp_min = st.number_input('Minimale Temperatur (°C)', format="%d", step=1)
+    temp_max = st.number_input('Maximale Temperatur (°C)', format="%d", step=1)
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
@@ -131,22 +126,16 @@ def main():
                     airports_details.append({
                         "Destination": airport_info['name'],
                         "IATA": flight['arrival']['airport']['iata'],
-                        "Departure Time (UTC)": flight['departure']['time']['utc'],
+                        "Departure Time (UTC)": flight['departure']['date']['utc'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
-                        "Weather Condition": weather_info['weather'][0]['description'],
-                        "Temperature (C)": weather_info['main']['temp']
+                        "Weather Condition": weather_info['weather'][0]['description'] if weather_info else "No data",
+                        "Temperature (C)": weather_info['main']['temp'] if weather_info else "No data"
                     })
-            st.json(airports_details)
             filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
             if filtered_flights:
                 st.write("Gefilterte internationale Flüge gefunden:")
-                for flight in filtered_flights:
-                    st.write(f"Destination: {flight['Destination']}, IATA: {flight['IATA']}, "
-                             f"Departure Time (UTC): {flight['Departure Time (UTC)']}, "
-                             f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}, "
-                             f"Weather Condition: {flight['Weather Condition']}, "
-                             f"Temperature (C): {flight['Temperature (C)']}")
+                st.table(filtered_flights)
             else:
                 st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
         else:
