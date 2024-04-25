@@ -98,47 +98,15 @@ def get_weather(lat, lon):
         return {"Temperature": temperature, "Condition": condition}
     return None
 
-def filter_flights_by_weather(flights_data, temp_min, temp_max, condition_selected):
-    filtered_flights = []
-    for flight in flights_data:
-        airport_info = get_airport_details(flight['arrival']['airport']['iata'])
-        if airport_info:
-            weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
-            if weather_info:
-                # Temperaturfilter
-                if ((temp_min is None or weather_info['Temperature'] >= temp_min) and
-                    (temp_max is None or weather_info['Temperature'] <= temp_max)):
-                    # Wetterbedingungsfilter
-                    if condition_selected.lower() in weather_info['Condition'].lower():
-                        filtered_flights.append(flight)
-    return filtered_flights
-
-
-def filter_flights_by_weather(flights_details, temp_min, temp_max, condition_selected):
-    filtered_flights = []
-    for detail in flights_details:
-        temp = detail.get("Temperature (C)", None)
-        cond = detail.get("Weather Condition", "").lower()
-        if ((temp_min is None or (temp is not None and temp >= temp_min)) and
-            (temp_max is None or (temp is not None and temp <= temp_max)) and
-            (condition_selected.lower() in cond)):
-            filtered_flights.append(detail)
-    return filtered_flights
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
     with col1:
         query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
     with col2:
         departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
-    with col3:
-        temp_min = st.number_input('Minimale Temperatur (°C)', value=-100, format="%d")
-        temp_max = st.number_input('Maximale Temperatur (°C)', value=100, format="%d")
-    with col4:
-        possible_conditions = ["Clear", "Clouds", "Rain", "Drizzle", "Snow", "Thunderstorm"]
-        condition_selected = st.selectbox('Wählen Sie eine Wetterbedingung', possible_conditions)
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
@@ -169,17 +137,16 @@ def main():
                             "Temperature (C)": weather_info['Temperature'] if weather_info else "No data"
                         })
 
-                filtered_flights = filter_flights_by_weather(airports_details, temp_min, temp_max, condition_selected)
-                if filtered_flights:
-                    st.write("Gefilterte internationale Flüge gefunden:")
-                    for flight in filtered_flights:
-                        st.write(f"Destination: {flight['Destination']}, IATA: {flight['IATA']}, "
-                                 f"Departure Time (UTC): {flight['Departure Time (UTC)']}, "
-                                 f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}, "
-                                 f"Weather Condition: {flight['Weather Condition']}, "
-                                 f"Temperature (C): {flight['Temperature (C)']}")
+                if airports_details:
+                    st.write("Internationale Flüge gefunden:")
+                    for airport in airports_details:
+                        st.write(f"Destination: {airport['Destination']}, IATA: {airport['IATA']}, "
+                                 f"Departure Time (UTC): {airport['Departure Time (UTC)']}, "
+                                 f"Latitude: {airport['Latitude']}, Longitude: {airport['Longitude']}, "
+                                 f"Weather Condition: {airport['Weather Condition']}, "
+                                 f"Temperature (C): {airport['Temperature (C)']}")
                 else:
-                    st.write("Keine Flüge gefunden, die den Wetterkriterien entsprechen.")
+                    st.write("Details zu den Flughäfen konnten nicht abgerufen werden.")
             else:
                 st.write("Keine internationalen Flüge gefunden.")
         else:
