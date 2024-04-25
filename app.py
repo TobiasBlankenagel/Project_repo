@@ -83,8 +83,8 @@ def get_weather(lat, lon):
     # Prüfe, ob die Anfrage erfolgreich war
     if response.status_code == 200:
         weather = response.json()
-        temperature = weather['list']['main']['temp']  # Temperatur in Celsius
-        condition = weather['list']['weather']['main']  # Wetterbeschreibung
+        temperature = weather['main']['temp']  # Temperatur in Celsius
+        condition = weather['weather'][0]['description']  # Wetterbeschreibung
         return {"Temperature": temperature, "Condition": condition}
     return None
 
