@@ -47,7 +47,6 @@ def get_most_frequent_country(autocomplete_data):
             else:
                 country_count[country] = 1
     # Wählt das Land mit den meisten Flughäfen
-    st.write(country_count)
     return max(country_count, key=country_count.get) if country_count else None
 
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
