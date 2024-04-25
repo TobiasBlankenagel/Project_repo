@@ -107,29 +107,6 @@ def display_flight_details(flight_id):
     # Diese Funktion könnte detaillierte Informationen zum ausgewählten Flug anzeigen
     st.write(f"Details für Flug {flight_id}")
 
-def get_city_by_coordinates(lat, lon):
-    url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
-    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
-    headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
-        "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
-    }
-    
-    try:
-        response = requests.get(url, headers=headers, params=querystring)
-        if response.status_code == 200:
-            data = response.json()
-            st.json(data)
-            if data and isinstance(data, list) and len(data) > 0:
-                nearest_city = data[0].get('City', 'Unknown City')
-                return nearest_city
-            else:
-                return 'No data available'
-        else:
-            return f"Error fetching data: Status Code {response.status_code}"
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
-
 
 def main():
     st.title('Suche dein Ferienerlebnis!')
@@ -150,7 +127,7 @@ def main():
             for flight in flights_data:
                 airport_info = get_airport_details(flight['arrival']['airport']['iata'])
                 if airport_info:
-                    city_name = get_city_by_coordinates(airport_info['latitude'], airport_info['longitude'])
+                    city_name = "Paris"
                     weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
                     airports_details.append({
                         "Destination": city_name,
