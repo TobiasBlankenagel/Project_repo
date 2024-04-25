@@ -9,13 +9,20 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
-        "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
+        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
-    # Eine kurze Verzögerung einführen, um weniger bot-artig zu wirken
-    time.sleep(1)  # Eine Sekunde warten
+    time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
     response = requests.get(url, headers=headers, params=querystring)
-    return response.json()
+    if response.status_code == 200:
+        data = response.json()
+        st.json(data)
+        if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
+            st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
+            return None
+        return data
+    st.error("Fehler beim Abrufen der Daten. Statuscode: {}".format(response.status_code))
+    return None
 
 
 # Fetch airport details like latitude and longitude using IATA code
@@ -41,7 +48,6 @@ def get_most_frequent_country(autocomplete_data):
             else:
                 country_count[country] = 1
     # Wählt das Land mit den meisten Flughäfen
-    st.write(country_count)
     return max(country_count, key=country_count.get) if country_count else None
 
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
@@ -51,7 +57,7 @@ def fetch_flights(departure_date, locations):
 
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
-        "X-RapidAPI-Key": "ffcf62515fmsh41b890b8371e503p1cda22jsn67c89bfef1c7",
+        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
@@ -67,17 +73,12 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             for flight in data:
-                departure_time_utc = flight['departure']['date']['utc']
+                departure_time_local = flight['departure']['date']['local']
                 arrival_iata = flight['arrival']['airport']['iata']
-                flight_key = (departure_time_utc, arrival_iata)
+                flight_key = (departure_time_local, arrival_iata)
+                flights_data.append(flight)
 
-                # Prüft nur, ob die gleiche Uhrzeit zum gleichen Zielort bereits gesehen wurde
-                if flight_key not in seen_flights:
-                    flights_data.append(flight)
-                    seen_flights.add(flight_key)
-                # Andernfalls, wenn es zur gleichen Zeit ist aber unterschiedliche Ziele hat, wird es auch hinzugefügt
-                elif all(flight_key[0] != f[0] or flight_key[1] != f[1] for f in seen_flights):
-                    flights_data.append(flight)
+
 
     return flights_data
 
@@ -103,22 +104,47 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
                 filtered_flights.append(flight)
     return filtered_flights
 
+def display_flight_details(flight_id):
+    # Diese Funktion könnte detaillierte Informationen zum ausgewählten Flug anzeigen
+    st.write(f"Details für Flug {flight_id}")
+
+def get_city_by_coordinates(lat, lon):
+    url = "https://geocodeapi.p.rapidapi.com/GetLargestCities"
+    # Increases the range to 30000 meters to find the largest nearby city
+    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
+    headers = {
+        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
+    }
+    
+    try:
+        response = requests.get(url, headers=headers, params=querystring)
+        if response.status_code == 200:
+            data = response.json()
+            st.json(data)
+            if data and isinstance(data, list) and len(data) > 0:
+                largest_city = data[0].get('City', 'Unknown City')
+                return largest_city
+            else:
+                return 'No data available'
+        else:
+            return f"Error fetching data: Status Code {response.status_code}"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
 
 
 def main():
-    st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
-    with col2:
-        departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
-    with col3:
-        temp_min = st.number_input('Minimale Temperatur (°C)', format="%d", step=1)
-        temp_max = st.number_input('Maximale Temperatur (°C)', format="%d", step=1)
+    st.title('Suche dein Ferienerlebnis!')
+    query = st.text_input('Gib einen Standort ein', '')
+    departure_date = st.date_input('Wähl ein Abflugdatum', min_value=date.today())
+    temp_min = st.number_input('Minimale Temperatur (°C) am Ziel', format="%d", step=1)
+    temp_max = st.number_input('Maximale Temperatur (°C) am Ziel', format="%d", step=1)
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
+        if autocomplete_data is None:
+            return
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
@@ -127,26 +153,28 @@ def main():
             for flight in flights_data:
                 airport_info = get_airport_details(flight['arrival']['airport']['iata'])
                 if airport_info:
+                    city_name = get_city_by_coordinates(airport_info['latitude'], airport_info['longitude'])
                     weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
                     airports_details.append({
-                        "Destination": airport_info['name'],
+                        "Destination": city_name,
                         "IATA": flight['arrival']['airport']['iata'],
-                        "Departure Time (UTC)": flight['departure']['time']['utc'],
+                        "Departure Time (local)": flight['departure']['time']['local'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
-                        "Weather Condition": weather_info['weather'][0]['description'],
-                        "Temperature (C)": weather_info['main']['temp']
+                        "Weather Condition": weather_info['weather'][0]['description'] if weather_info else "No data",
+                        "Temperature (C)": weather_info['main']['temp'] if weather_info else "No data"
                     })
-            st.json(airports_details)
+
             filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
             if filtered_flights:
-                st.write("Gefilterte internationale Flüge gefunden:")
+                st.write("Gefilterte Flüge gefunden:")
                 for flight in filtered_flights:
-                    st.write(f"Destination: {flight['Destination']}, IATA: {flight['IATA']}, "
-                             f"Departure Time (UTC): {flight['Departure Time (UTC)']}, "
-                             f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}, "
-                             f"Weather Condition: {flight['Weather Condition']}, "
-                             f"Temperature (C): {flight['Temperature (C)']}")
+                    with st.expander(f"Flug nach {flight['Destination']} (IATA: {flight['IATA']})"):
+                        st.write(f"Abflugzeit (lokal): {flight['Departure Time (local)']}")
+                        st.write(f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}")
+                        st.write(f"Wetter: {flight['Weather Condition']} bei {flight['Temperature (C)']} °C")
+                        if st.button("Mehr Details", key=flight['IATA']):
+                            display_flight_details(flight['IATA'])
             else:
                 st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
         else:
