@@ -28,7 +28,7 @@ def fetch_autocomplete_data(query):
 def get_airport_details(iata_code):
     url = f"https://aviation-reference-data.p.rapidapi.com/airports/{iata_code}"
     headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
         "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers)
@@ -111,9 +111,9 @@ def get_city_by_coordinates(lat, lon):
     url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
     querystring = {"latitude": str(lat), "longitude": str(lon), "range": "0"}
     headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Key": "ffcf62515fmsh41b890b8371e503p1cda22jsn67c89bfef1c7",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
-    }c
+    }
     response = requests.get(url, headers=headers, params=querystring)
     if response.status_code == 200:
         data = response.json()
