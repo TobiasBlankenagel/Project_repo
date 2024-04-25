@@ -131,6 +131,7 @@ def main():
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
+        st.json(autocomplete_data)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = []
