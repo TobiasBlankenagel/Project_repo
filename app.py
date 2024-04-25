@@ -75,6 +75,23 @@ def fetch_flights(departure_date, locations):
 
     return flights_data
 
+def get_weather(lat, lon):
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": "afe025cb2b8a2785c5837a3eaed7b62a",
+        "units": "metric",  # Setzt die Temperatureinheit auf Celsius
+        "lang": "de"  # Ergebnisse auf Deutsch
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        weather = response.json()
+        temperature = weather['main']['temp']  # Temperatur in Celsius
+        condition = weather['weather'][0]['description']  # Wetterbeschreibung
+        return {"Temperature": temperature, "Condition": condition}
+    return None
+
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
@@ -102,13 +119,16 @@ def main():
                 for flight in flights_data:
                     airport_info = get_airport_details(flight['arrival']['airport']['iata'])
                     if airport_info:
+                        weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
                         # Details für jeden Flughafen sammeln
                         airports_details.append({
                             "Destination": airport_info['name'],
                             "IATA": flight['arrival']['airport']['iata'],
-                            "Departure Time (UTC)": flight['departure']['time']['utc'],
+                            "Departure Time (UTC)": flight['departure']['date']['utc'],
                             "Latitude": airport_info['latitude'],
-                            "Longitude": airport_info['longitude']
+                            "Longitude": airport_info['longitude'],
+                            "Weather Condition": weather_info['Condition'] if weather_info else "No data",
+                            "Temperature (C)": weather_info['Temperature'] if weather_info else "No data"
                         })
 
                 if airports_details:
@@ -116,7 +136,9 @@ def main():
                     for airport in airports_details:
                         st.write(f"Destination: {airport['Destination']}, IATA: {airport['IATA']}, "
                                  f"Departure Time (UTC): {airport['Departure Time (UTC)']}, "
-                                 f"Latitude: {airport['Latitude']}, Longitude: {airport['Longitude']}")
+                                 f"Latitude: {airport['Latitude']}, Longitude: {airport['Longitude']}, "
+                                 f"Weather Condition: {airport['Weather Condition']}, "
+                                 f"Temperature (C): {airport['Temperature (C)']}")
                 else:
                     st.write("Details zu den Flughäfen konnten nicht abgerufen werden.")
             else:
