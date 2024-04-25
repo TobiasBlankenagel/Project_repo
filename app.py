@@ -121,7 +121,6 @@ def get_city_by_coordinates(lat, lon):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json()
-            st.json(data)
             if data and isinstance(data, list) and len(data) > 0:
                 largest_city = data[0].get('City', 'Unknown City')
                 return largest_city
