@@ -11,6 +11,7 @@ def fetch_autocomplete_data(query):
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
+    st.json(response)
     return response.json()
 
 # Fetch airport details like latitude and longitude using IATA code
@@ -36,6 +37,7 @@ def get_most_frequent_country(autocomplete_data):
             else:
                 country_count[country] = 1
     # Wählt das Land mit den meisten Flughäfen
+    st.write(country_count)
     return max(country_count, key=country_count.get) if country_count else None
 
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
@@ -72,7 +74,7 @@ def fetch_flights(departure_date, locations):
                 # Andernfalls, wenn es zur gleichen Zeit ist aber unterschiedliche Ziele hat, wird es auch hinzugefügt
                 elif all(flight_key[0] != f[0] or flight_key[1] != f[1] for f in seen_flights):
                     flights_data.append(flight)
-
+    st.json(flight_data)
     return flights_data
 
 
