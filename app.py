@@ -108,7 +108,12 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
                 filtered_flights.append(flight)
     return filtered_flights
 
+def display_flight_details(flight_id):
+    # Diese Funktion könnte detaillierte Informationen zum ausgewählten Flug anzeigen
+    st.write(f"Details für Flug {flight_id}")
 
+
+import streamlit as st
 
 def main():
     st.title('Suche dein Ferienerlebnis!')
@@ -120,7 +125,7 @@ def main():
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data is None:
-            return 
+            return
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
@@ -139,10 +144,17 @@ def main():
                         "Weather Condition": weather_info['weather'][0]['description'] if weather_info else "No data",
                         "Temperature (C)": weather_info['main']['temp'] if weather_info else "No data"
                     })
+
             filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
             if filtered_flights:
                 st.write("Gefilterte Flüge gefunden:")
-                st.table(filtered_flights)
+                for flight in filtered_flights:
+                    with st.expander(f"Flug von {flight['Destination']} (IATA: {flight['IATA']})"):
+                        st.write(f"Abflugzeit (lokal): {flight['Departure Time (local)']}")
+                        st.write(f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}")
+                        st.write(f"Wetter: {flight['Weather Condition']} bei {flight['Temperature (C)']} °C")
+                        if st.button("Mehr Details", key=flight['IATA']):
+                            display_flight_details(flight['IATA'])
             else:
                 st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
         else:
