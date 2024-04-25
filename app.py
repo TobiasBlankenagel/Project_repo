@@ -15,7 +15,6 @@ def fetch_autocomplete_data(query):
     # Eine kurze Verzögerung einführen, um weniger bot-artig zu wirken
     time.sleep(1)  # Eine Sekunde warten
     response = requests.get(url, headers=headers, params=querystring)
-    st.json(response)
     return response.json()
 
 
@@ -115,6 +114,7 @@ def main():
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
+        st.json(autocomplete_data)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
