@@ -94,11 +94,14 @@ def get_weather(lat, lon):
     return response.json() if response.status_code == 200 else None
 
 def filter_flights_by_temperature(flights_details, temp_min, temp_max):
-    return [
-        flight for flight in flights_details
-        if (temp_min is None or flight['Temperature (C)'] >= temp_min) and
-           (temp_max is None or flight['Temperature (C)'] <= temp_max)
-    ]
+    filtered_flights = []
+    for flight in flights_details:
+        temp = flight.get("Temperature (C)", None)  # Holt den Temperaturwert, Standard ist None
+        # Überprüft, ob die Temperatur nicht None ist und ob sie innerhalb der gesetzten Grenzen liegt
+        if temp is not None:  # Stellt sicher, dass temp einen gültigen Wert hat
+            if (temp_min is None or temp >= temp_min) and (temp_max is None or temp <= temp_max):
+                filtered_flights.append(flight)
+    return filtered_flights
 
 
 
@@ -110,9 +113,10 @@ def main():
         query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
     with col2:
         departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
-    with col3:
-        temp_min = st.number_input('Minimale Temperatur (°C)', value=-100, format="%d")
-        temp_max = st.number_input('Maximale Temperatur (°C)', value=100, format="%d")
+with col3:
+    temp_min = st.number_input('Minimale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die minimale Temperatur ein", allow_none=True)
+    temp_max = st.number_input('Maximale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die maximale Temperatur ein", allow_none=True)
+
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
