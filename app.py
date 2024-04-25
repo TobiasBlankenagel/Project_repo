@@ -91,18 +91,30 @@ def main():
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
             location_info = []
+            airports_details = []
+
             for item in autocomplete_data.get('data', []):
-                # Überprüfe, ob das aktuelle Element ein Flughafen ist
-                if item['navigation']['entityType'] == 'AIRPORT':
-                    # Überprüfe, ob der Untertitel des Items mit der Länderauswahl endet
-                    if item['presentation']['subtitle'] == country_choice:
-                        # Hole die skyId und füge sie zur location_info Liste hinzu
-                        sky_id = item['navigation']['relevantFlightParams']['skyId']
-                        location_info.append(sky_id)
+                if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice:
+                    sky_id = item['navigation']['relevantFlightParams']['skyId']
+                    location_info.append(sky_id)
+
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
             if flights_data:
-                st.write("Internationale Flüge gefunden:")
-                st.json(flights_data)
+                for flight in flights_data:
+                    airport_info = get_airport_details(flight['arrival']['airport']['iata'])
+                    if airport_info:
+                        airports_details.append({
+                            "IATA": flight['arrival']['airport']['iata'],
+                            "Details": airport_info
+                        })
+
+                if airports_details:
+                    st.write("Internationale Flüge gefunden:")
+                    for airport in airports_details:
+                        st.write(f"IATA: {airport['IATA']}, Details: {airport['Details']}")
+                else:
+                    st.write("Details zu den Flughäfen konnten nicht abgerufen werden.")
+
             else:
                 st.write("Keine internationalen Flüge gefunden.")
         else:
@@ -110,3 +122,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
