@@ -16,7 +16,6 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     if response.status_code == 200:
         data = response.json()
-        st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
             return None
@@ -109,9 +108,8 @@ def display_flight_details(flight_id):
     st.write(f"Details für Flug {flight_id}")
 
 def get_city_by_coordinates(lat, lon):
-    url = "https://geocodeapi.p.rapidapi.com/GetLargestCities"
-    # Increases the range to 30000 meters to find the largest nearby city
-    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
+    url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
+    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "0"}
     headers = {
         "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
@@ -121,17 +119,15 @@ def get_city_by_coordinates(lat, lon):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json()
-            st.json(data)
             if data and isinstance(data, list) and len(data) > 0:
-                largest_city = data[0].get('City', 'Unknown City')
-                return largest_city
+                nearest_city = data[0].get('City', 'Unknown City')
+                return nearest_city
             else:
                 return 'No data available'
         else:
             return f"Error fetching data: Status Code {response.status_code}"
     except Exception as e:
         return f"An error occurred: {str(e)}"
-
 
 
 def main():
