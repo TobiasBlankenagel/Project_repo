@@ -41,7 +41,7 @@ def get_most_frequent_country(autocomplete_data):
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
 def fetch_flights(departure_date, locations):
     flights_data = []
-    flight_times_and_destinations = set()  # Set zum Speichern der Kombinationen von Abflugzeiten und Zielen
+    departure_times = set()  # Set zum Speichern der Abflugzeiten
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
         "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
@@ -60,19 +60,13 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             for flight in data:
-                departure_time_utc = flight['departure']['date']['utc']
-                arrival_iata = flight['arrival']['airport']['iata']  # Extrahiere den IATA-Code des Zielorts
-                # Erstelle ein Tuple aus Uhrzeit und Ziel-IATA-Code
-                flight_signature = (departure_time_utc, arrival_iata)
-                
-                # Überprüfe, ob die Kombination bereits existiert
-                if flight_signature not in flight_times_and_destinations:
+                departure_time_utc = flight['departure']['time']['utc']
+                if departure_time_utc not in departure_times:  # Überprüfen, ob die Zeit schon vorhanden ist
                     if flight['arrival']['country']['code'] != flight['departure']['country']['code']:
                         flights_data.append(flight)
-                        flight_times_and_destinations.add(flight_signature)  # Füge die neue Kombination zum Set hinzu
+                        departure_times.add(departure_time_utc)  # Zeit zur Menge hinzufügen
 
     return flights_data
-
 
 
 def main():
