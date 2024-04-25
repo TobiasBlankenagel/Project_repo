@@ -41,16 +41,13 @@ def get_most_frequent_country(autocomplete_data):
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
 def fetch_flights(departure_date, locations):
     flights_data = []
+    departure_times = set()  # Set zum Speichern der Abflugzeiten
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
         "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
-    # Ausgabe der JSON-Datei für location_info
-   #st.write("JSON-Datei für location_info:")
-   #st.json(locations) # hier wird eine Liste von IATA-Codes ausgegeben
-    
     for iata_code in locations:
         querystring = {
             "version": "v2",
@@ -62,13 +59,15 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
-            # st.json(data)
-            # Filter out domestic flights
-            country_code = data[0]['departure']['country']['code']
             for flight in data:
-                if flight['arrival']['country']['code'] != country_code:
-                    flights_data.append(flight)
+                departure_time_utc = flight['departure']['date']['utc']
+                if departure_time_utc not in departure_times:  # Überprüfen, ob die Zeit schon vorhanden ist
+                    if flight['arrival']['country']['code'] != flight['departure']['country']['code']:
+                        flights_data.append(flight)
+                        departure_times.add(departure_time_utc)  # Zeit zur Menge hinzufügen
+
     return flights_data
+
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
