@@ -128,14 +128,13 @@ def main():
                 airport_info = get_airport_details(flight['arrival']['airport']['iata'])
                 if airport_info:
                     weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
-                    st.json(weather_info)
                     airports_details.append({
                         "Destination": airport_info['name'],
                         "IATA": flight['arrival']['airport']['iata'],
                         "Departure Time (UTC)": flight['departure']['date']['utc'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
-                        "Weather Condition": weather_info['weather']['description'],
+                        "Weather Condition": weather_info['weather'][0]['description'],
                         "Temperature (C)": weather_info['main']['temp']
                     })
             st.json(airports_details)
