@@ -114,17 +114,14 @@ def main():
     with col2:
         departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
     with col3:
-        temp_min = st.number_input('Minimale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die minimale Temperatur ein", allow_none=True)
-        temp_max = st.number_input('Maximale Temperatur (°C)', min_value=-100, max_value=100, format="%d", step=1, help="Geben Sie die maximale Temperatur ein", allow_none=True)
-
+        temp_min = st.number_input('Minimale Temperatur (°C)', format="%d", step=1)
+        temp_max = st.number_input('Maximale Temperatur (°C)', format="%d", step=1)
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data:
             country_choice = get_most_frequent_country(autocomplete_data)
-            location_info = [item['navigation']['relevantFlightParams']['skyId']
-                             for item in autocomplete_data.get('data', [])
-                             if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
+            location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
             flights_data = fetch_flights(departure_date.isoformat(), location_info)
             airports_details = []
             for flight in flights_data:
@@ -140,7 +137,8 @@ def main():
                         "Weather Condition": weather_info.get('Condition', "No data") if weather_info else "No data",
                         "Temperature (C)": weather_info.get('Temperature') if weather_info else "No data"
                     })
-            filtered_flights = filter_flights_by_temperature(airports_details, temp_min, temp_max)
+
+            filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
             if filtered_flights:
                 st.write("Gefilterte internationale Flüge gefunden:")
                 for flight in filtered_flights:
