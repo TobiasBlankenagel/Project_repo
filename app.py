@@ -7,7 +7,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
-        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
+        "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
@@ -40,7 +40,7 @@ def fetch_flights(departure_date, locations):
     flights_data = []
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
-        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
+        "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
@@ -67,19 +67,24 @@ def fetch_flights(departure_date, locations):
                     flights_data.append(flight)
     return flights_data
 
-# Fetch weather information based on latitude and longitude
 def get_weather(lat, lon):
-    url = "https://yahoo-weather5.p.rapidapi.com/weather"
-    querystring = {"lat":lat, "long":lon, "format":"json", "u":"c"}
-    headers = {
-        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
-        "X-RapidAPI-Host": "yahoo-weather5.p.rapidapi.com"
+    # OpenWeather API URL
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    # API-Schlüssel und Koordinaten hinzufügen
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": "afe025cb2b8a2785c5837a3eaed7b62a",  # Dein OpenWeather API-Key
+        "units": "metric",  # Setzt die Temperatureinheit auf Celsius
+        "lang": "de"  # Ergebnisse auf Deutsch
     }
-    response = requests.get(url, headers=headers, params=querystring)
+    # Anfrage an die OpenWeather API senden
+    response = requests.get(url, params=params)
+    # Prüfe, ob die Anfrage erfolgreich war
     if response.status_code == 200:
         weather = response.json()
-        temperature = weather['current_observation']['condition']['temperature']
-        condition = weather['current_observation']['condition']['text']
+        temperature = weather['list']['main']['temp']  # Temperatur in Celsius
+        condition = weather['list']['weather']['main']  # Wetterbeschreibung
         return {"Temperature": temperature, "Condition": condition}
     return None
 
@@ -108,7 +113,7 @@ def main():
                             if airport_data:
                                 latitude = airport_data['latitude']
                                 longitude = airport_data['longitude']
-                                weather = get_weather(latitude, longitude)
+                                weather = get_weather(latitude, longitude) # muss geändert werden, da unbegrenzte api requests
                                 airports_details.append({
                                     "IATA": iata_code,
                                     "Latitude": latitude,
