@@ -16,6 +16,7 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     if response.status_code == 200:
         data = response.json()
+        st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
             return None
