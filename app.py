@@ -72,9 +72,9 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             for flight in data:
-                departure_time_utc = flight['departure']['date']['utc']
+                departure_time_local = flight['departure']['date']['local']
                 arrival_iata = flight['arrival']['airport']['iata']
-                flight_key = (departure_time_utc, arrival_iata)
+                flight_key = (departure_time_local, arrival_iata)
 
                 # Prüft nur, ob die gleiche Uhrzeit zum gleichen Zielort bereits gesehen wurde
                 if flight_key not in seen_flights:
@@ -133,7 +133,7 @@ def main():
                     airports_details.append({
                         "Destination": airport_info['name'],
                         "IATA": flight['arrival']['airport']['iata'],
-                        "Departure Time (UTC)": flight['departure']['time']['utc'],
+                        "Departure Time (local)": flight['departure']['time']['local'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
                         "Weather Condition": weather_info['weather'][0]['description'] if weather_info else "No data",
@@ -141,7 +141,7 @@ def main():
                     })
             filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
             if filtered_flights:
-                st.write("Gefilterte internationale Flüge gefunden:")
+                st.write("Gefilterte Flüge gefunden:")
                 st.table(filtered_flights)
             else:
                 st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
