@@ -98,15 +98,36 @@ def get_weather(lat, lon):
         return {"Temperature": temperature, "Condition": condition}
     return None
 
+def filter_flights_by_weather(flights_data, temp_min, temp_max, condition_selected):
+    filtered_flights = []
+    for flight in flights_data:
+        airport_info = get_airport_details(flight['arrival']['airport']['iata'])
+        if airport_info:
+            weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
+            if weather_info:
+                # Temperaturfilter
+                if ((temp_min is None or weather_info['Temperature'] >= temp_min) and
+                    (temp_max is None or weather_info['Temperature'] <= temp_max)):
+                    # Wetterbedingungsfilter
+                    if condition_selected.lower() in weather_info['Condition'].lower():
+                        filtered_flights.append(flight)
+    return filtered_flights
+
 
 def main():
     st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
     with col2:
         departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
+    with col3:
+        temp_min = st.number_input('Minimale Temperatur (°C)', min_value=-100, max_value=100, value=None, step=1, format=None)
+        temp_max = st.number_input('Maximale Temperatur (°C)', min_value=-100, max_value=100, value=None, step=1, format=None)
+    with col4:
+        possible_conditions = ["Clear", "Clouds", "Rain", "Drizzle", "Snow", "Thunderstorm"]
+        condition_selected = st.selectbox('Wählen Sie eine Wetterbedingung', possible_conditions)
 
     if st.button("Suche starten") and query:
         autocomplete_data = fetch_autocomplete_data(query)
@@ -130,7 +151,7 @@ def main():
                         airports_details.append({
                             "Destination": airport_info['name'],
                             "IATA": flight['arrival']['airport']['iata'],
-                            "Departure Time (UTC)": flight['departure']['date']['utc'],
+                            "Departure Time (UTC)": flight['departure']['time']['utc'],
                             "Latitude": airport_info['latitude'],
                             "Longitude": airport_info['longitude'],
                             "Weather Condition": weather_info['Condition'] if weather_info else "No data",
