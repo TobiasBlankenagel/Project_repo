@@ -106,9 +106,9 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
 
 
 def main():
-    st.title('Auto-Complete Suche für Flughäfen und Flugdatenabfrage')
-    query = st.text_input('Geben Sie einen Standort ein, z.B. London', '')
-    departure_date = st.date_input('Wählen Sie ein Abflugdatum', min_value=date.today())
+    st.title('Suche dein Ferienerlebnis!')
+    query = st.text_input('Gib einen Standort ein', '')
+    departure_date = st.date_input('Wähl ein Abflugdatum', min_value=date.today())
     temp_min = st.number_input('Minimale Temperatur (°C)', format="%d", step=1)
     temp_max = st.number_input('Maximale Temperatur (°C)', format="%d", step=1)
 
@@ -126,7 +126,7 @@ def main():
                     airports_details.append({
                         "Destination": airport_info['name'],
                         "IATA": flight['arrival']['airport']['iata'],
-                        "Departure Time (UTC)": flight['departure']['date']['utc'],
+                        "Departure Time (UTC)": flight['departure']['time']['utc'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
                         "Weather Condition": weather_info['weather'][0]['description'] if weather_info else "No data",
