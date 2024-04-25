@@ -41,7 +41,8 @@ def get_most_frequent_country(autocomplete_data):
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
 def fetch_flights(departure_date, locations):
     flights_data = []
-    departure_times = set()  # Set zum Speichern der Abflugzeiten
+    seen_flights = set()  # Speichert Tuples aus Uhrzeit und Ziel-IATA-Code
+
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
         "X-RapidAPI-Key": "1ebd07a20dmsh3d8c30c0e64a87ep15d844jsn48cdaa310b4a",
@@ -60,13 +61,20 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             for flight in data:
-                departure_time_utc = flight['departure']['time']['utc']
-                if departure_time_utc not in departure_times:  # Überprüfen, ob die Zeit schon vorhanden ist
-                    if flight['arrival']['country']['code'] != flight['departure']['country']['code']:
-                        flights_data.append(flight)
-                        departure_times.add(departure_time_utc)  # Zeit zur Menge hinzufügen
+                departure_time_utc = flight['departure']['date']['utc']
+                arrival_iata = flight['arrival']['airport']['iata']
+                flight_key = (departure_time_utc, arrival_iata)
+
+                # Prüft nur, ob die gleiche Uhrzeit zum gleichen Zielort bereits gesehen wurde
+                if flight_key not in seen_flights:
+                    flights_data.append(flight)
+                    seen_flights.add(flight_key)
+                # Andernfalls, wenn es zur gleichen Zeit ist aber unterschiedliche Ziele hat, wird es auch hinzugefügt
+                elif all(flight_key[0] != f[0] or flight_key[1] != f[1] for f in seen_flights):
+                    flights_data.append(flight)
 
     return flights_data
+
 
 
 def main():
