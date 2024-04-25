@@ -135,8 +135,8 @@ def main():
                         "Departure Time (UTC)": flight['departure']['date']['utc'],
                         "Latitude": airport_info['latitude'],
                         "Longitude": airport_info['longitude'],
-                        "Weather Condition": weather_info.get('Condition', "No data") if weather_info else "No data",
-                        "Temperature (C)": weather_info.get('Temperature') if weather_info else "No data"
+                        "Weather Condition": weather_info['weather']['description'],
+                        "Temperature (C)": weather_info['main']['temp']
                     })
             st.json(airports_details)
             filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
