@@ -9,7 +9,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
-        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
+        "X-RapidAPI-Key": "3079417e42mshe0aa2e580bcff7bp13da24jsn11f2ff015d49",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
