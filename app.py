@@ -14,7 +14,7 @@ def fetch_autocomplete_data(query):
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
     response = requests.get(url, headers=headers, params=querystring)
-    st.json(response)
+    st.write(response)
     if response.status_code == 200:
         data = response.json()
         st.json(data)
