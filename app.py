@@ -187,7 +187,7 @@ def sortiere_fluege(flugdaten, sortierschluessel):
     :param sortierschluessel: Der Schlüssel, nach dem sortiert werden soll ('Temperatur (C)' oder 'Abflugzeit (lokal)').
     :return: Die sortierte Liste der Flugdaten.
     """
-    return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('inf'))
+    return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('-inf'), reverse=True)
 
 
 
