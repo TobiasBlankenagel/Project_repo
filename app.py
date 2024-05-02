@@ -175,6 +175,15 @@ def packliste():
 # This function is to be placed where you handle the choice of viewing the packing checklist.
 
 
+def sortiere_fluege(flugdaten, sortierschluessel):
+    """
+    Sortiert die Liste der Flugdaten basierend auf dem angegebenen Schlüssel.
+    
+    :param flugdaten: Liste von Dictionaries, jedes enthält Fluginformationen.
+    :param sortierschluessel: Der Schlüssel, nach dem sortiert werden soll ('Temperatur (C)' oder 'Abflugzeit (lokal)').
+    :return: Die sortierte Liste der Flugdaten.
+    """
+    return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('inf'))
 
 
 
@@ -198,6 +207,9 @@ def suche_fluege():
     abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today())
     min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
     max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
+    sortierschluessel = st.radio("Sortieren nach:", ['Abflugzeit (lokal)', 'Temperatur (C)'])
+
+
 
     if st.button("Suche starten") and standort:
         autocomplete_daten = fetch_autocomplete_data(standort)
@@ -228,8 +240,9 @@ def suche_fluege():
             gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
             st.write(gefilterte_fluege)
             if gefilterte_fluege:
+                sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
                 st.write("Gefilterte Flüge gefunden:")
-                for flug in gefilterte_fluege:
+                for flug in sortierte_fluege:
                     with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C"):
                         st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                         st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
