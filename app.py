@@ -30,7 +30,7 @@ def fetch_autocomplete_data(query):
 def get_airport_details(iata_code):
     url = f"https://aviation-reference-data.p.rapidapi.com/airports/{iata_code}"
     headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
         "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers)
@@ -58,7 +58,7 @@ def fetch_flights(departure_date, locations):
 
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
