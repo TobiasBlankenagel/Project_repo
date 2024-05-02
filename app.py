@@ -88,7 +88,7 @@ def get_weather(lat, lon):
     params = {
         "lat": lat,
         "lon": lon,
-        "appid": "afe025cb2b8a2785c5837a3eaed7b62a",
+        "appid": "5609e5c95ae59033e36538f65e15b9da",
         "units": "metric",
         "lang": "de"
     }
@@ -114,7 +114,7 @@ def get_city_by_coordinates(lat, lon):
     # Increases the range to 30000 meters to find the largest nearby city
     querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
     headers = {
-        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
     }
     
