@@ -98,6 +98,7 @@ def get_weather(lat, lon):
 def filter_flights_by_temperature(flights_details, temp_min, temp_max):
     filtered_flights = []
     for flight in flights_details:
+        st.write(flight)
         temp = flight.get("Temperature (C)", None)  # Holt den Temperaturwert, Standard ist None
         # Überprüft, ob die Temperatur nicht None ist und ob sie innerhalb der gesetzten Grenzen liegt
         if temp is not None:  # Stellt sicher, dass temp einen gültigen Wert hat
@@ -207,7 +208,6 @@ def suche_fluege():
                         "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
                         "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten"
                     })
-                    st.write(flughafen_details)
 
             gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
             st.write(gefilterte_fluege)
