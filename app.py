@@ -133,49 +133,6 @@ def get_city_by_coordinates(lat, lon):
         return f"An error occurred: {str(e)}"
 
 
-import folium
-from folium import folium_static
-from pyowm.owm import OWM
-from folium.plugins import HeatMap
-from datetime import datetime, timedelta
-import streamlit as st
-
-
-
-owm = OWM('afe025cb2b8a2785c5837a3eaed7b62a')
-mgr = owm.weather_manager()
-
-def create_temperature_map(date_choice):
-    # Define some sample locations (latitude, longitude) for simplicity
-    locations = {
-        'Berlin': (52.5200, 13.4050),
-        'Paris': (48.8566, 2.3522),
-        'London': (51.5074, -0.1278),
-        'Rome': (41.9028, 12.4964)
-    }
-    map_data = []
-
-    for city, (lat, lon) in locations.items():
-        # Get weather forecast
-        forecast = mgr.one_call(lat, lon).forecast_daily
-        weather = forecast[0] if date_choice == 'Today' else forecast[1] if date_choice == 'Tomorrow' else forecast[2]
-        temperature = weather.temperature('celsius')['day']
-        map_data.append([lat, lon, temperature])
-
-    # Create a map centered around Europe
-    map = folium.Map(location=[50.1109, 10.1503], zoom_start=4)
-    # Add a heat map layer
-    HeatMap(map_data, radius=25).add_to(map)
-    return map
-
-def show_temperature_map():
-    st.title('Temperature Map')
-    date_choice = st.selectbox('Select Date', ['Today', 'Tomorrow', 'Day After Tomorrow'])
-    temperature_map = create_temperature_map(date_choice)
-    folium_static(temperature_map)
-
-# This function is to be placed where you handle the choice of viewing the temperature map.
-
 
 
 
