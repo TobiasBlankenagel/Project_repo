@@ -174,7 +174,7 @@ def main():
     elif app_modus == "Temperaturkarte anzeigen":
         st.sidebar.write("Das Feature für die Temperaturkarte wird hier hinzugefügt.")
     elif app_modus == "Packliste":
-        packing_checklist()
+        packliste()
 
 def suche_fluege():
     st.title('Suche dein Reiseerlebnis!')
