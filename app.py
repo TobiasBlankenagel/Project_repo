@@ -229,9 +229,8 @@ def suche_fluege():
             if gefilterte_fluege:
                 st.write("Gefilterte Flüge gefunden:")
                 for flug in gefilterte_fluege:
-                    with st.expander(f"Flug nach {flug['Zielort']} (IATA: {flug['IATA']}), {flug['Zielland']}"):
+                    with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}"):
                         st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
-                        st.write(f"Latitude: {flug['Latitude']}, Longitude: {flug['Longitude']}")
                         st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                         if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
                             display_flight_details(flug['IATA'])
