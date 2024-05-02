@@ -135,6 +135,17 @@ def get_city_by_coordinates(lat, lon):
 
 def main():
     st.title('Suche dein Ferienerlebnis!')
+    st.markdown('<h1 style="color:red;">Welcome to Our Flight Search App!</h1>', unsafe_allow_html=True)
+    st.markdown('''
+    <style>
+    .big-font {
+        font-size:30px !important;
+        font-weight: bold;
+    }
+    </style>
+    <div class="big-font">Large Text Example</div>
+    ''', unsafe_allow_html=True)
+
     query = st.text_input('Gib einen Standort ein', '')
     departure_date = st.date_input('Wähl ein Abflugdatum', min_value=date.today())
     temp_min = st.number_input('Minimale Temperatur (°C) am Ziel', format="%d", step=1)
