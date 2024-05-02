@@ -134,25 +134,28 @@ def get_city_by_coordinates(lat, lon):
 
 
 
-def packing_checklist():
-    st.title("Packing Checklist")
-    temperature = st.number_input("What is the temperature at your destination?", format='%d')
-    checklist_items = []
+def packliste():
+    st.title("Packliste")
+    # Die Temperatur wird jetzt als Integer abgefragt, um die Warnung zu vermeiden.
+    temperatur = st.number_input("Wie hoch ist die Temperatur an deinem Zielort?", format='%d', step=1)
+    checkliste = []
 
-    if temperature < 7:
-        checklist_items = ["Warm jacket", "Gloves", "Beanie", "Thermal wear"]
-    elif temperature <= 17:
-        checklist_items = ["Light jacket", "Long pants", "Sweater", "Scarf"]
+    if temperatur < 7:
+        checkliste = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
+    elif temperatur <= 17:
+        checkliste = ["Leichte Jacke", "Lange Hosen", "Pullover", "Schal"]
     else:
-        checklist_items = ["T-shirts", "Shorts", "Sunglasses", "Sunscreen"]
+        checkliste = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
 
-    st.write("Here are your packing recommendations:")
-    for item in checklist_items:
-        checkbox_id = f"checkbox_{item}"
-        if st.checkbox(item, key=checkbox_id):
-            st.markdown(f"<s>{item}</s>", unsafe_allow_html=True)
+    st.write("Hier sind deine Packempfehlungen:")
+    for artikel in checkliste:
+        # Erzeugt einen eindeutigen Schlüssel für jedes Element zur Verwendung mit Checkboxen.
+        checkbox_id = f"checkbox_{artikel}"
+        # Erstellt eine Checkbox direkt neben dem Artikeltext.
+        if st.checkbox("", key=checkbox_id, value=False):
+            st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
         else:
-            st.write(item)
+            st.write(artikel)
 
 # This function is to be placed where you handle the choice of viewing the packing checklist.
 
