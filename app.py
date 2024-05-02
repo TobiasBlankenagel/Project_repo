@@ -38,6 +38,18 @@ def get_airport_details(iata_code):
         return response.json()
     return None
 
+def get_country_to_airport(alpha2countryCode):
+    url = f"https://aviation-reference-data.p.rapidapi.com/countries/{alpha2countryCode}"
+    headers = {
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
+        "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        country = data['name']
+    return country
+
 # Sammelt und wählt das Land mit den meisten Flughäfen automatisch aus
 def get_most_frequent_country(autocomplete_data):
     country_count = {}
@@ -199,9 +211,11 @@ def suche_fluege():
                 flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
                 if flughafen_info:
                     stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
+                    ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
                     wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
                     flughafen_details.append({
                         "Zielort": stadt_name,
+                        "Zielland": ziel_land,
                         "IATA": flug['arrival']['airport']['iata'],
                         "Abflugzeit (lokal)": flug['departure']['time']['local'],
                         "Latitude": flughafen_info['latitude'],
@@ -215,7 +229,7 @@ def suche_fluege():
             if gefilterte_fluege:
                 st.write("Gefilterte Flüge gefunden:")
                 for flug in gefilterte_fluege:
-                    with st.expander(f"Flug nach {flug['Zielort']} (IATA: {flug['IATA']})"):
+                    with st.expander(f"Flug nach {flug['Zielort']} (IATA: {flug['IATA']}), {flug['Zielland']}"):
                         st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                         st.write(f"Latitude: {flug['Latitude']}, Longitude: {flug['Longitude']}")
                         st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
