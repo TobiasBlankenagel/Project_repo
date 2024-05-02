@@ -14,10 +14,8 @@ def fetch_autocomplete_data(query):
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
     response = requests.get(url, headers=headers, params=querystring)
-    st.write(response)
     if response.status_code == 200:
         data = response.json()
-        st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
             return None
@@ -133,15 +131,33 @@ def get_city_by_coordinates(lat, lon):
         return f"An error occurred: {str(e)}"
 
 
+import streamlit as st
+import requests
+from datetime import date
+
+# Other necessary imports and functions should be defined here.
+
 def main():
-    st.title('Suche dein Ferienerlebnis!')
+    # Setup sidebar for navigation between different features
+    st.sidebar.title("Menu")
+    app_mode = st.sidebar.selectbox("Choose the option", ["Search Flights", "View Temperature Map", "Packing Checklist"])
 
-    query = st.text_input('Gib einen Standort ein', '')
-    departure_date = st.date_input('Wähl ein Abflugdatum', min_value=date.today())
-    temp_min = st.number_input('Minimale Temperatur (°C) am Ziel', format="%d", step=1)
-    temp_max = st.number_input('Maximale Temperatur (°C) am Ziel', format="%d", step=1)
+    if app_mode == "Search Flights":
+        search_flights()
+    elif app_mode == "View Temperature Map":
+        st.sidebar.write("Temperature map feature will be added here.")
+    elif app_mode == "Packing Checklist":
+        st.sidebar.write("Packing checklist feature will be added here.")
 
-    if st.button("Suche starten") and query:
+def search_flights():
+    st.title('Search your travel experience!')
+
+    query = st.text_input('Enter a location', '')
+    departure_date = st.date_input('Choose a departure date', min_value=date.today())
+    temp_min = st.number_input('Minimum temperature (°C) at destination', format="%d", step=1)
+    temp_max = st.number_input('Maximum temperature (°C) at destination', format="%d", step=1)
+
+    if st.button("Start Search") and query:
         autocomplete_data = fetch_autocomplete_data(query)
         if autocomplete_data is None:
             return
@@ -167,18 +183,18 @@ def main():
 
             filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
             if filtered_flights:
-                st.write("Gefilterte Flüge gefunden:")
+                st.write("Filtered flights found:")
                 for flight in filtered_flights:
-                    with st.expander(f"Flug nach {flight['Destination']} (IATA: {flight['IATA']})"):
-                        st.write(f"Abflugzeit (lokal): {flight['Departure Time (local)']}")
+                    with st.expander(f"Flight to {flight['Destination']} (IATA: {flight['IATA']})"):
+                        st.write(f"Departure Time (local): {flight['Departure Time (local)']}")
                         st.write(f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}")
-                        st.write(f"Wetter: {flight['Weather Condition']} bei {flight['Temperature (C)']} °C")
-                        if st.button("Mehr Details", key=flight['IATA']):
-                            display_flight_details(flight['IATA'])
+                        st.write(f"Weather: {flight['Weather Condition']} at {flight['Temperature (C)']} °C")
+                        if st.button("More Details", key=flight['IATA']):
+                            display_flight_details(fight['IATA'])
             else:
-                st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
+                st.write("No flights found that match the temperature criteria.")
         else:
-            st.error("Keine Antwort von der API. Überprüfen Sie die Netzwerkverbindung oder API-Schlüssel.")
+            st.error("No response from the API. Check your network connection or API keys.")
 
 if __name__ == "__main__":
     main()
