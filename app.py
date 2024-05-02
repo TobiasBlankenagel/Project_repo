@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from datetime import date
-
+import base64
 # Autocomplete Suchleiste für Nutzer
 import time
 
@@ -20,11 +20,8 @@ def fetch_autocomplete_data(query):
     if response.status_code == 200:
         data = response.json()
         st.json(data)
-        return data
-    elif response.status_code == 429 or response.status_code == 403:  # Common status codes for rate limits or denials
-        # Check if response is blocked by a captcha
-        if 'message' in response.json() and 'redirect_to' in response.json()['message']:
-            redirect_url = response.json()['message']['redirect_to']
+        if 'message' in data and 'redirect_to' in data['message']:
+            redirect_url = data['message']['redirect_to']
             # Decode URL if needed (assuming it's base64 encoded)
             if 'url' in redirect_url:
                 base_url = "https://skyscanner80.p.rapidapi.com"  # Base URL for the API
@@ -32,7 +29,7 @@ def fetch_autocomplete_data(query):
                 st.markdown(f"Please verify you are not a robot by clicking [here]({full_url}) and completing the CAPTCHA.")
             else:
                 st.error("You are being rate limited or blocked. Please try again later.")
-        return None
+        return data
     else:
         st.error(f"Failed to fetch data. Status code: {response.status_code}")
         return None
