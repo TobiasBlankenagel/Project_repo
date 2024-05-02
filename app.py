@@ -134,63 +134,64 @@ def get_city_by_coordinates(lat, lon):
 
 
 def main():
-    # Setup sidebar for navigation between different features
-    st.sidebar.title("Menu")
-    app_mode = st.sidebar.selectbox("Choose the option", ["Search Flights", "View Temperature Map", "Packing Checklist"])
+    # Einrichten der Seitenleiste für die Navigation zwischen verschiedenen Funktionen
+    st.sidebar.title("Menü")
+    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Temperaturkarte anzeigen", "Packliste"])
 
-    if app_mode == "Search Flights":
-        search_flights()
-    elif app_mode == "View Temperature Map":
-        st.sidebar.write("Temperature map feature will be added here.")
-    elif app_mode == "Packing Checklist":
-        st.sidebar.write("Packing checklist feature will be added here.")
+    if app_modus == "Flüge suchen":
+        suche_fluege()
+    elif app_modus == "Temperaturkarte anzeigen":
+        st.sidebar.write("Das Feature für die Temperaturkarte wird hier hinzugefügt.")
+    elif app_modus == "Packliste":
+        st.sidebar.write("Das Feature für die Packliste wird hier hinzugefügt.")
 
-def search_flights():
-    st.title('Search your travel experience!')
+def suche_fluege():
+    st.title('Suche dein Reiseerlebnis!')
 
-    query = st.text_input('Enter a location', '')
-    departure_date = st.date_input('Choose a departure date', min_value=date.today())
-    temp_min = st.number_input('Minimum temperature (°C) at destination', format="%d", step=1)
-    temp_max = st.number_input('Maximum temperature (°C) at destination', format="%d", step=1)
+    standort = st.text_input('Gib einen Standort ein', '')
+    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today())
+    min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
+    max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
 
-    if st.button("Start Search") and query:
-        autocomplete_data = fetch_autocomplete_data(query)
-        if autocomplete_data is None:
+    if st.button("Suche starten") and standort:
+        autocomplete_daten = fetch_autocomplete_data(standort)
+        if autocomplete_daten is None:
             return
-        if autocomplete_data:
-            country_choice = get_most_frequent_country(autocomplete_data)
-            location_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_data.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == country_choice]
-            flights_data = fetch_flights(departure_date.isoformat(), location_info)
-            airports_details = []
-            for flight in flights_data:
-                airport_info = get_airport_details(flight['arrival']['airport']['iata'])
-                if airport_info:
-                    city_name = get_city_by_coordinates(airport_info['latitude'], airport_info['longitude'])
-                    weather_info = get_weather(airport_info['latitude'], airport_info['longitude'])
-                    airports_details.append({
-                        "Destination": city_name,
-                        "IATA": flight['arrival']['airport']['iata'],
-                        "Departure Time (local)": flight['departure']['time']['local'],
-                        "Latitude": airport_info['latitude'],
-                        "Longitude": airport_info['longitude'],
-                        "Weather Condition": weather_info['weather'][0]['description'] if weather_info else "No data",
-                        "Temperature (C)": weather_info['main']['temp'] if weather_info else "No data"
+        if autocomplete_daten:
+            land_auswahl = get_most_frequent_country(autocomplete_daten)
+            standort_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_daten.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == land_auswahl]
+            flugdaten = fetch_flights(abflugdatum.isoformat(), standort_info)
+            flughafen_details = []
+            for flug in flugdaten:
+                flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
+                if flughafen_info:
+                    stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
+                    wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                    flughafen_details.append({
+                        "Zielort": stadt_name,
+                        "IATA": flug['arrival']['airport']['iata'],
+                        "Abflugzeit (lokal)": flug['departure']['time']['local'],
+                        "Latitude": flughafen_info['latitude'],
+                        "Longitude": flughafen_info['longitude'],
+                        "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
+                        "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten"
                     })
 
-            filtered_flights = filter_flights_by_temperature(airports_details, temp_min if temp_min != 0 else None, temp_max if temp_max != 0 else None)
-            if filtered_flights:
-                st.write("Filtered flights found:")
-                for flight in filtered_flights:
-                    with st.expander(f"Flight to {flight['Destination']} (IATA: {flight['IATA']})"):
-                        st.write(f"Departure Time (local): {flight['Departure Time (local)']}")
-                        st.write(f"Latitude: {flight['Latitude']}, Longitude: {flight['Longitude']}")
-                        st.write(f"Weather: {flight['Weather Condition']} at {flight['Temperature (C)']} °C")
-                        if st.button("More Details", key=flight['IATA']):
-                            display_flight_details(fight['IATA'])
+            gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
+            if gefilterte_fluege:
+                st.write("Gefilterte Flüge gefunden:")
+                for flug in gefilterte_fluege:
+                    with st.expander(f"Flug nach {flug['Zielort']} (IATA: {flug['IATA']})"):
+                        st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
+                        st.write(f"Latitude: {flug['Latitude']}, Longitude: {flug['Longitude']}")
+                        st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
+                        if st.button("Mehr Details", key=flug['IATA']):
+                            display_flight_details(flug['IATA'])
             else:
-                st.write("No flights found that match the temperature criteria.")
+                st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
         else:
-            st.error("No response from the API. Check your network connection or API keys.")
+            st.error("Keine Antwort von der API. Überprüfen Sie Ihre Netzwerkverbindung oder API-Schlüssel.")
 
 if __name__ == "__main__":
     main()
+
