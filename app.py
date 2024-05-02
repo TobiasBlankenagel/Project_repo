@@ -134,6 +134,27 @@ def get_city_by_coordinates(lat, lon):
 
 
 
+def packing_checklist():
+    st.title("Packing Checklist")
+    temperature = st.number_input("What is the temperature at your destination?", format='%d')
+    checklist_items = []
+
+    if temperature < 7:
+        checklist_items = ["Warm jacket", "Gloves", "Beanie", "Thermal wear"]
+    elif temperature <= 17:
+        checklist_items = ["Light jacket", "Long pants", "Sweater", "Scarf"]
+    else:
+        checklist_items = ["T-shirts", "Shorts", "Sunglasses", "Sunscreen"]
+
+    st.write("Here are your packing recommendations:")
+    for item in checklist_items:
+        checkbox_id = f"checkbox_{item}"
+        if st.checkbox(item, key=checkbox_id):
+            st.markdown(f"<s>{item}</s>", unsafe_allow_html=True)
+        else:
+            st.write(item)
+
+# This function is to be placed where you handle the choice of viewing the packing checklist.
 
 
 
@@ -150,7 +171,7 @@ def main():
     elif app_modus == "Temperaturkarte anzeigen":
         st.sidebar.write("Das Feature für die Temperaturkarte wird hier hinzugefügt.")
     elif app_modus == "Packliste":
-        st.sidebar.write("Das Feature für die Packliste wird hier hinzugefügt.")
+        packing_checklist()
 
 def suche_fluege():
     st.title('Suche dein Reiseerlebnis!')
