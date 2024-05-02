@@ -210,7 +210,6 @@ def suche_fluege():
                     })
 
             gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
-            st.write(gefilterte_fluege)
             if gefilterte_fluege:
                 st.write("Gefilterte Flüge gefunden:")
                 for flug in gefilterte_fluege:
