@@ -101,6 +101,7 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
         st.write(flight)
         temp = flight.get("Temperature (C)", None)  # Holt den Temperaturwert, Standard ist None
         # Überprüft, ob die Temperatur nicht None ist und ob sie innerhalb der gesetzten Grenzen liegt
+        st.write(temp)
         if temp is not None:  # Stellt sicher, dass temp einen gültigen Wert hat
             if (temp_min is None or temp >= temp_min) and (temp_max is None or temp <= temp_max):
                 filtered_flights.append(flight)
