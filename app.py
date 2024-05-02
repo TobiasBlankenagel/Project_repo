@@ -16,8 +16,8 @@ def fetch_autocomplete_data(query):
     response = requests.get(url, headers=headers, params=querystring)
     # st.write(response)
     if response.status_code == 200:
-        # data = response.json()
-        st.json(data)
+        data = response.json()
+        # st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             # hier Link einbauen für Seite neu laden oder captcha
             if data['message']['reason'] == 'blocked':
