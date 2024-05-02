@@ -21,8 +21,8 @@ def fetch_autocomplete_data(query):
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             # hier Link einbauen für Seite neu laden oder captcha
             if data['message']['reason'] == 'blocked':
-                link = data['message']['redirect_to']
-                st.write(f'Klicken sie diesen Link um sich zu verifizieren und kehren Sie dann zurück: {link}')
+                link = f'https://www.skyscanner.de{data['message']['redirect_to']}'
+                st.markdown(f'[Klicken Sie diesen Link um sich zu verifizieren und kehren Sie dann zurück]({link})', unsafe_allow_html=True)
             else:
                 st.error("Die API denkt, dass Sie ein Bot sind. Bitte laden Sie die Seite neu.")
             return None
