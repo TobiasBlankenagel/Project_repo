@@ -133,12 +133,14 @@ def get_city_by_coordinates(lat, lon):
         return f"An error occurred: {str(e)}"
 
 
-
 import folium
+from folium import folium_static
 from pyowm.owm import OWM
 from folium.plugins import HeatMap
 from datetime import datetime, timedelta
 import streamlit as st
+
+
 
 owm = OWM('afe025cb2b8a2785c5837a3eaed7b62a')
 mgr = owm.weather_manager()
