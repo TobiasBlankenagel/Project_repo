@@ -5,6 +5,8 @@ from datetime import date
 # Autocomplete Suchleiste für Nutzer
 import time
 
+
+
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
@@ -18,12 +20,28 @@ def fetch_autocomplete_data(query):
     if response.status_code == 200:
         data = response.json()
         st.json(data)
-        if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
-            st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
-            return None
         return data
-    st.error("Fehler beim Abrufen der Daten. Statuscode: {}".format(response.status_code))
-    return None
+    elif response.status_code == 429 or response.status_code == 403:  # Common status codes for rate limits or denials
+        # Check if response is blocked by a captcha
+        if 'message' in response.json() and 'redirect_to' in response.json()['message']:
+            redirect_url = response.json()['message']['redirect_to']
+            # Decode URL if needed (assuming it's base64 encoded)
+            if 'url' in redirect_url:
+                base_url = "https://skyscanner80.p.rapidapi.com"  # Base URL for the API
+                full_url = base_url + redirect_url
+                st.markdown(f"Please verify you are not a robot by clicking [here]({full_url}) and completing the CAPTCHA.")
+            else:
+                st.error("You are being rate limited or blocked. Please try again later.")
+        return None
+    else:
+        st.error(f"Failed to fetch data. Status code: {response.status_code}")
+        return None
+    
+
+
+
+
+
 
 
 # Fetch airport details like latitude and longitude using IATA code
