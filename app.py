@@ -233,7 +233,7 @@ def suche_fluege():
                         st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                         st.write(f"Latitude: {flug['Latitude']}, Longitude: {flug['Longitude']}")
                         st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
-                        if st.button("Mehr Details", key=flug['IATA']):
+                        if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
                             display_flight_details(flug['IATA'])
             else:
                 st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
