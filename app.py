@@ -73,7 +73,6 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
-            st.json(data)
             for flight in data:
                 departure_time_local = flight['departure']['date']['local']
                 arrival_iata = flight['arrival']['airport']['iata']
