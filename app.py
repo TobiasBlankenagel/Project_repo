@@ -14,9 +14,9 @@ def fetch_autocomplete_data(query):
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
     response = requests.get(url, headers=headers, params=querystring)
-    st.write(response)
+    # st.write(response)
     if response.status_code == 200:
-        data = response.json()
+        # data = response.json()
         st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             # hier Link einbauen für Seite neu laden oder captcha
@@ -115,10 +115,10 @@ def get_weather(lat, lon):
 def filter_flights_by_temperature(flights_details, temp_min, temp_max):
     filtered_flights = []
     for flight in flights_details:
-        st.write(flight)
+        # st.write(flight)
         temp = flight["Temperatur (C)"] # Holt den Temperaturwert, Standard ist None
         # Überprüft, ob die Temperatur nicht None ist und ob sie innerhalb der gesetzten Grenzen liegt
-        st.write(temp)
+        # st.write(temp)
         if temp is not None:  # Stellt sicher, dass temp einen gültigen Wert hat
             if (temp_min is None or temp >= temp_min) and (temp_max is None or temp <= temp_max):
                 filtered_flights.append(flight)
