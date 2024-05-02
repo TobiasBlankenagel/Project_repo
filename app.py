@@ -196,9 +196,12 @@ def suche_fluege():
             flughafen_details = []
             for flug in flugdaten:
                 flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
+                st.write(flughafen_info)
                 if flughafen_info:
                     stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
+                    st.write(stadt_name)
                     wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                    st.write(wetter_info)
                     flughafen_details.append({
                         "Zielort": stadt_name,
                         "IATA": flug['arrival']['airport']['iata'],
@@ -208,6 +211,7 @@ def suche_fluege():
                         "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
                         "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten"
                     })
+                    st.write(flughafen_details)
 
             gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
             if gefilterte_fluege:
