@@ -49,7 +49,6 @@ def get_most_frequent_country(autocomplete_data):
             else:
                 country_count[country] = 1
     # Wählt das Land mit den meisten Flughäfen
-    st.write(country_count)
     return max(country_count, key=country_count.get) if country_count else None
 
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
@@ -76,8 +75,7 @@ def fetch_flights(departure_date, locations):
             data = response.json().get('data', [])
             for flight in data:
                 departure_time_local = flight['departure']['date']['local']
-                arrival_iata = flight['arrival']['airport']['iata']
-                flight_key = (departure_time_local, arrival_iata)
+                flight_key = (departure_time_local)
                 if flight_key not in seen_flights:  # Prüft, ob der Flug bereits gesehen wurde
                     flights_data.append(flight)
                     seen_flights.add(flight_key)  # Fügt den Flug zum Set der gesehenen Flüge hinzu
