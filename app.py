@@ -23,7 +23,8 @@ def fetch_autocomplete_data(query):
             if data['message']['reason'] == 'blocked':
                 link = data['message']['redirect_to']
                 st.write(f'Klicken sie diesen Link um sich zu verifizieren und kehren Sie dann zurück: {link}')
-            st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
+            else:
+                st.error("Die API denkt, dass Sie ein Bot sind. Bitte laden Sie die Seite neu.")
             return None
         return data
     st.error("Fehler beim Abrufen der Daten. Statuscode: {}".format(response.status_code))
