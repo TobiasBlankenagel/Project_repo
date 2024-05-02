@@ -73,6 +73,7 @@ def fetch_flights(departure_date, locations):
         response = requests.get(url, headers=headers, params=querystring)
         if response.status_code == 200:
             data = response.json().get('data', [])
+            st.json(data)
             for flight in data:
                 departure_time_local = flight['departure']['date']['local']
                 arrival_iata = flight['arrival']['airport']['iata']
@@ -209,6 +210,7 @@ def suche_fluege():
                     })
 
             gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
+            st.write(gefilterte_fluege)
             if gefilterte_fluege:
                 st.write("Gefilterte Flüge gefunden:")
                 for flug in gefilterte_fluege:
