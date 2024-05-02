@@ -20,6 +20,9 @@ def fetch_autocomplete_data(query):
         st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
             # hier Link einbauen für Seite neu laden oder captcha
+            if data['message']['reason'] == 'blocked':
+                link = data['message']['redirect_to']
+                st.write(f'Klicken sie diesen Link um sich zu verifizieren und kehren Sie dann zurück: {link}')
             st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
             return None
         return data
