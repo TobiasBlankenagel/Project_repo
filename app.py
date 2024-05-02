@@ -19,6 +19,7 @@ def fetch_autocomplete_data(query):
         data = response.json()
         st.json(data)
         if not data.get('status', True):  # Prüft den Status; Standardwert ist True für den Fall, dass 'status' nicht vorhanden ist
+            # hier Link einbauen für Seite neu laden oder captcha
             st.error("Die API denkt, dass Sie ein Bot sind. Bitte versuchen Sie, die Anfrage zu wiederholen.")
             return None
         return data
@@ -229,7 +230,7 @@ def suche_fluege():
             if gefilterte_fluege:
                 st.write("Gefilterte Flüge gefunden:")
                 for flug in gefilterte_fluege:
-                    with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}"):
+                    with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C"):
                         st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                         st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                         if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
