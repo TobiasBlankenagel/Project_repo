@@ -74,8 +74,9 @@ def fetch_flights(departure_date, locations):
         if response.status_code == 200:
             data = response.json().get('data', [])
             for flight in data:
-                departure_time_local = flight['departure']['date']['local']
-                flight_key = (departure_time_local)
+                departure_time_local = flight['departure']['time']['local']
+                arrival_iata = flight['arrival']['airport']['iata']
+                flight_key = (departure_time_local, arrival_iata)
                 if flight_key not in seen_flights:  # Prüft, ob der Flug bereits gesehen wurde
                     flights_data.append(flight)
                     seen_flights.add(flight_key)  # Fügt den Flug zum Set der gesehenen Flüge hinzu
