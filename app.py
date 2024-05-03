@@ -196,12 +196,12 @@ def get_distance(lat, lon, alat, alon):
     return km_distance
 
 
-def get_price(source_iata, destination_iata):
+def get_price(source_iata, destination_iata, datum):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
     querystring = {
         "sourceAirportCode": source_iata,
         "destinationAirportCode": destination_iata,
-        "date": "2024-05-05",
+        "date": datum,
         "itineraryType": "ONE_WAY",
         "sortOrder": "PRICE",
         "numAdults": "1",
@@ -311,7 +311,7 @@ def suche_fluege():
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                             st.write(f"Entfernung: {flug['Entfernung']} km")
-                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'])}")
+                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum)}")
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
