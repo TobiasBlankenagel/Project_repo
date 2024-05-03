@@ -312,7 +312,7 @@ def suche_fluege():
     # Konvertiere das Datum in das gewünschte Format "YYYY/MM/DD"
     formatiertes_datum = morgen.strftime("%Y/%m/%d")
     standort = st.text_input('Gib einen Standort ein', '')
-    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value='2024-05-05')
+    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value='2024/05/05')
     min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
     max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
     sortierschluessel = st.radio("Sortieren nach:", ['Entfernung', 'Temperatur (C)'])
