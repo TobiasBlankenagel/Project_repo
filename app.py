@@ -133,7 +133,7 @@ def get_city_by_coordinates(lat, lon):
     # Increases the range to 30000 meters to find the largest nearby city
     querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
     headers = {
-        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
+        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
     }
     
