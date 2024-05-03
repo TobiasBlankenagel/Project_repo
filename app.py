@@ -277,7 +277,7 @@ def suche_fluege():
                     inkrement = 0.25 / flugdaten_länge  # 25% des Fortschritts sind für diese Phase reserviert
                 else:
                     inkrement = 0.25  # Vermeide Division durch Null
-                aktueller_fortschritt = 0.  # Beginne bei 50% nach dem Laden der Autovervollständigungsdaten
+                aktueller_fortschritt = 0.5  # Beginne bei 50% nach dem Laden der Autovervollständigungsdaten
                 progress.progress(aktueller_fortschritt)
                 flughafen_koordinaten = get_airport_details(flugdaten[0]['departure']['airport']['iata'])
 
