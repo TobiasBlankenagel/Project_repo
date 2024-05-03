@@ -202,7 +202,7 @@ def get_distance(lat, lon, alat, alon):
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
-def get_price(source_iata, destination_iata, datum, iata_key):
+def get_price(source_iata, destination_iata, datum, number):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
     querystring = {
         "sourceAirportCode": source_iata,
@@ -217,6 +217,7 @@ def get_price(source_iata, destination_iata, datum, iata_key):
         "nonstop": "yes",
         "currencyCode": "USD"
     }
+ 
     headers = {
         "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
         "X-RapidAPI-Host": "tripadvisor16.p.rapidapi.com"
@@ -224,7 +225,7 @@ def get_price(source_iata, destination_iata, datum, iata_key):
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
     st.json(data)
-    price = data['data']['flights'][1]['purchaseLinks'][0]['totalPricePerPassenger']
+    price = data['data']['flights'][number]['purchaseLinks'][0]['totalPricePerPassenger']
 
     return price
 
@@ -322,13 +323,20 @@ def suche_fluege():
                     for flug in sortierte_fluege:
                         # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
                         iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
+                        # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
+                        if iata_key not in bereits_verwendete_iata_codes:
+                            bereits_verwendete_iata_codes.append(iata_key)
+                            index = 0
+                        else:
+                            # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
+                            index = bereits_verwendete_iata_codes.count(iata_key)
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
                         with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C", expanded=expanded):
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                             st.write(f"Entfernung: {flug['Entfernung']} km")
-                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, iata_key)}")
+                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)}")
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
