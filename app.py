@@ -115,6 +115,7 @@ def get_weather(lat, lon):
         "lang": "de"
     }
     response = requests.get(url, params=params)
+    st.json(response)
     return response.json() if response.status_code == 200 else None
 
 @st.cache_data
