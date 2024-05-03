@@ -105,11 +105,8 @@ def fetch_flights(departure_date, locations):
 
     return flights_data
 
-import datetime
-
-def get_weather(lat, lon, ):
+def get_weather(lat, lon):
     url = "https://api.openweathermap.org/data/2.5/forecast"
-
     params = {
         "lat": lat,
         "lon": lon,
@@ -119,6 +116,7 @@ def get_weather(lat, lon, ):
     }
     response = requests.get(url, params=params)
     st.json(response)
+
     return response.json() if response.status_code == 200 else None
 
 @st.cache_data
