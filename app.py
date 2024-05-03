@@ -315,13 +315,25 @@ def suche_fluege():
                 gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
                 sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
                 progress.progress(100)  # Kompletter Fortschritt
+                # Führe eine Liste für bereits verwendete IATA-Codes
+                bereits_verwendete_iata_codes = []
+
                 if gefilterte_fluege:
                     st.write("Gefilterte Flüge gefunden:")
-                    for index, flug in enumerate(sortierte_fluege):
-                        expander_key = f"expander_{flug['IATA']}_{flug['IATA_dep']}"
+                    for flug in sortierte_fluege:
+                        # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
+                        iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
+                        # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
+                        if iata_key not in bereits_verwendete_iata_codes:
+                            bereits_verwendete_iata_codes.append(iata_key)
+                            index = 0
+                        else:
+                            # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
+                            index = bereits_verwendete_iata_codes.count(iata_key)
+
+                        expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
                         with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C", expanded=expanded):
-                        # Zeige Fluginformationen an
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                             st.write(f"Entfernung: {flug['Entfernung']} km")
