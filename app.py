@@ -234,7 +234,7 @@ def suche_fluege():
     abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today())
     min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
     max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
-    sortierschluessel = st.radio("Sortieren nach:", ['Abflugzeit (lokal)', 'Temperatur (C)'])
+    sortierschluessel = st.radio("Sortieren nach:", ['Entfernung', 'Temperatur (C)'])
 
 
 
