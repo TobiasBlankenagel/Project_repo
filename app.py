@@ -307,9 +307,10 @@ def main():
 
 def suche_fluege():
     st.title('Suche dein Reiseerlebnis!')
-
+    
+    morgen = date.today() + timedelta(days=1)
     standort = st.text_input('Gib einen Standort ein', '')
-    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today() + timedelta(days=1))
+    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=morgen)
     min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
     max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
     sortierschluessel = st.radio("Sortieren nach:", ['Entfernung', 'Temperatur (C)'])
@@ -319,7 +320,6 @@ def suche_fluege():
     if st.button("Suche starten") and standort:
         with st.spinner('Die Flüge werden geladen...'):
             progress = st.progress(0)  # Initiiert den Fortschrittsbalken mit 0%
-            morgen = date.today() + timedelta(days=1)
             übermorgen = date.today() + timedelta(days=2)
             überübermorgen = date.today() + timedelta(days=3)
             überüberübermorgen = date.today() + timedelta(days=4)
