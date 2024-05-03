@@ -176,10 +176,24 @@ def packliste():
         else:
             st.write(artikel)
 
+
 def get_distance(lat, lon, alat, alon):
-    return None
+    url = "https://distance-calculator8.p.rapidapi.com/calc"
+    querystring = {
+        "startLatitude": str(lat),
+        "startLongitude": str(lon),
+        "endLatitude": str(alat),
+        "endLongitude": str(alon)
+    }
 
-
+    headers = {
+        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
+        "X-RapidAPI-Host": "distance-calculator8.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    distance_data = response.json()
+    km_distance = distance_data['body']['distance']['kilometers']
+    return km_distance
 
 
 def get_price():
@@ -271,7 +285,7 @@ def suche_fluege():
                         with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C"):
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
-                            st.write(f"Entfernung: {flug['Entfernung']}")
+                            st.write(f"Entfernung: {flug['Entfernung']} km")
                             st.write(f"Preis: {flug['Preis']}")
 
                             if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
