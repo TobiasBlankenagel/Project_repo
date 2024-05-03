@@ -176,6 +176,15 @@ def packliste():
         else:
             st.write(artikel)
 
+def get_distance(lat, lon, alat, alon):
+    return None
+
+
+
+
+def get_price():
+    return None
+
 # This function is to be placed where you handle the choice of viewing the packing checklist.
 
 
@@ -226,6 +235,7 @@ def suche_fluege():
                 land_auswahl = get_most_frequent_country(autocomplete_daten)
                 standort_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_daten.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == land_auswahl]
                 flugdaten = fetch_flights(abflugdatum.isoformat(), standort_info)
+                flughafen_koordinaten = get_airport_details(flugdaten[0]['departure']['airport']['iata'])
                 progress.progress(50)  # Aktualisiert den Fortschrittsbalken auf 50%
 
                 flughafen_details = []
@@ -235,6 +245,8 @@ def suche_fluege():
                         stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
                         ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
                         wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                        Entfernung = flughafen_koordinaten['latitude'], flughafen_koordinaten['longitude']
+                        Preis = get_price()
                         flughafen_details.append({
                             "Zielort": stadt_name,
                             "Zielland": ziel_land,
@@ -244,8 +256,8 @@ def suche_fluege():
                             "Longitude": flughafen_info['longitude'],
                             "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
                             "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten",
-                            "Entfernung": 0,
-                            "Preis": 0,
+                            "Entfernung": Entfernung,
+                            "Preis": Preis,
                         })
                 progress.progress(75)  # Setzt den Fortschrittsbalken auf 75%
 
