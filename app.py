@@ -1,9 +1,12 @@
 import streamlit as st
 import requests
 from datetime import date
-
+from cachetools import cached, TTLCache
 # Autocomplete Suchleiste für Nutzer
 import time
+
+# Cache-Konfiguration: Speichert bis zu 100 Einträge, jeder für 600 Sekunden (10 Minuten)
+cache = TTLCache(maxsize=100, ttl=600)
 
 def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
@@ -29,7 +32,6 @@ def fetch_autocomplete_data(query):
         return data
     st.error("Fehler beim Abrufen der Daten. Statuscode: {}".format(response.status_code))
     return None
-
 
 # Fetch airport details like latitude and longitude using IATA code
 def get_airport_details(iata_code):
@@ -68,6 +70,7 @@ def get_most_frequent_country(autocomplete_data):
     # Wählt das Land mit den meisten Flughäfen
     return max(country_count, key=country_count.get) if country_count else None
 
+@cached(cache)
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
 def fetch_flights(departure_date, locations):
     flights_data = []
@@ -112,6 +115,7 @@ def get_weather(lat, lon):
     response = requests.get(url, params=params)
     return response.json() if response.status_code == 200 else None
 
+@cached(cache)
 def filter_flights_by_temperature(flights_details, temp_min, temp_max):
     filtered_flights = []
     for flight in flights_details:
@@ -127,6 +131,7 @@ def filter_flights_by_temperature(flights_details, temp_min, temp_max):
 def display_flight_details(flight_id):
     # Diese Funktion könnte detaillierte Informationen zum ausgewählten Flug anzeigen
     st.write(f"Details für Flug {flight_id}")
+
 
 def get_city_by_coordinates(lat, lon):
     url = "https://geocodeapi.p.rapidapi.com/GetLargestCities"
@@ -195,7 +200,7 @@ def get_distance(lat, lon, alat, alon):
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
-
+@cached(cache)
 def get_price(source_iata, destination_iata, datum):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
     querystring = {
@@ -203,7 +208,7 @@ def get_price(source_iata, destination_iata, datum):
         "destinationAirportCode": destination_iata,
         "date": datum,
         "itineraryType": "ONE_WAY",
-        "sortOrder": "PRICE",
+        "sortOrder": "EARLIEST_OUTBOUND_DEPARTURE",
         "numAdults": "1",
         "numSeniors": "0",
         "classOfService": "ECONOMY",
@@ -318,7 +323,7 @@ def suche_fluege():
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                             st.write(f"Entfernung: {flug['Entfernung']} km")
-                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum)}")
+                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, flug['Abflugzeit (lokal)'])}")
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
