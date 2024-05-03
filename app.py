@@ -333,7 +333,7 @@ def suche_fluege():
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
 
-                        price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, iata_key, index)
+                        price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
 
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
