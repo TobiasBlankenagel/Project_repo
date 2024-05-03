@@ -294,7 +294,6 @@ def suche_fluege():
                             "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
                             "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten",
                             "Entfernung": Entfernung,
-                            "Preis": Preis,
                         })
                 progress.progress(75)  # Setzt den Fortschrittsbalken auf 75%
 
