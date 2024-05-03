@@ -106,7 +106,7 @@ def fetch_flights(departure_date, locations):
     return flights_data
 
 def get_weather(lat, lon):
-    url = "https://api.openweathermap.org/data/2.5/weather"
+    url = "https://api.openweathermap.org/data/2.5/forecast"
     params = {
         "lat": lat,
         "lon": lon,
