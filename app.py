@@ -105,14 +105,15 @@ def fetch_flights(departure_date, locations):
 
     return flights_data
 
-def get_weather(lat, lon):
-    url = "https://api.openweathermap.org/data/2.5/weather"
+def get_weather(lat, lon, datum):
+    url = "https://api.openweathermap.org/data/2.5/forecast"
     params = {
         "lat": lat,
         "lon": lon,
         "appid": "5609e5c95ae59033e36538f65e15b9da",
         "units": "metric",
-        "lang": "de"
+        "lang": "de",
+        "dt": datum
     }
     response = requests.get(url, params=params)
     return response.json() if response.status_code == 200 else None
@@ -342,7 +343,7 @@ def suche_fluege():
                     if flughafen_info:
                         stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
                         ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
-                        wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                        wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'], abflugdatum)
                         Entfernung = get_distance(flughafen_info['latitude'], flughafen_info['longitude'], flughafen_koordinaten['latitude'], flughafen_koordinaten['longitude'])
                         flughafen_details.append({
                             "Zielort": stadt_name,
