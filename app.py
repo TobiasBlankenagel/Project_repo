@@ -288,6 +288,8 @@ def sortiere_fluege(flugdaten, sortierschluessel):
     """
     return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('-inf'), reverse=True)
 
+import folium
+from folium.plugins import HeatMap
 def temperaturkarte():
     return None
 
