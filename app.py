@@ -224,13 +224,14 @@ def get_price(source_iata, destination_iata, datum, number):
     }
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
-    st.json(data)
     price = data['data']['flights'][number]['purchaseLinks'][0]['totalPricePerPassenger']
+    booking_url = data['data']['flights'][number]['purchaseLinks'][0]['url']
 
-    return price
+    return price, booking_url
+
+# data['data']['flights'][number]['purchaseLinks'][0]['url']
 
 # This function is to be placed where you handle the choice of viewing the packing checklist.
-
 
 def sortiere_fluege(flugdaten, sortierschluessel):
     """
@@ -322,6 +323,7 @@ def suche_fluege():
                     st.write("Gefilterte Flüge gefunden:")
                     for flug in sortierte_fluege:
                         # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
+        
                         iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
                         # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
                         if iata_key not in bereits_verwendete_iata_codes:
@@ -330,13 +332,17 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
+
+                        price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, iata_key, index)
+
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
                         with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C", expanded=expanded):
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                             st.write(f"Entfernung: {flug['Entfernung']} km")
-                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)}")
+                            st.write(f"Preis: ${price}")
+                            st.markdown(f"[Buche jetzt]({booking_url})", unsafe_allow_html=True)
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
