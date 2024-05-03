@@ -202,7 +202,6 @@ def get_distance(lat, lon, alat, alon):
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
-@st.cache_data
 def get_price(source_iata, destination_iata, datum, nummer):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
     querystring = {
@@ -330,7 +329,6 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
-                            st.write(index)
 
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
@@ -338,7 +336,7 @@ def suche_fluege():
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
                             st.write(f"Entfernung: {flug['Entfernung']} km")
-                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)}")
+                            st.write(f"Preis: {get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, 1)}")
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
