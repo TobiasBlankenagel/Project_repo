@@ -302,7 +302,7 @@ def suche_fluege():
                             "Entfernung": Entfernung,
                         })
                     aktueller_fortschritt += inkrement
-                    progress.progress(50+aktueller_fortschritt)  # Aktualisiere den Fortschrittsbalken und vermeide Überschreitung von 100%
+                    progress.progress(aktueller_fortschritt)  # Aktualisiere den Fortschrittsbalken und vermeide Überschreitung von 100%
 
 
                 gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
