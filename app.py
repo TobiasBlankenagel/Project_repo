@@ -199,7 +199,6 @@ def get_distance(lat, lon, alat, alon):
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
-@st.cache_data
 def get_price(source_iata, destination_iata, datum):
     url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
     querystring = {
