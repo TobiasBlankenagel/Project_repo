@@ -288,7 +288,8 @@ def sortiere_fluege(flugdaten, sortierschluessel):
     """
     return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('-inf'), reverse=True)
 
-
+def temperaturkarte():
+    return None
 
 
 def main():
@@ -299,7 +300,7 @@ def main():
     if app_modus == "Flüge suchen":
         suche_fluege()
     elif app_modus == "Temperaturkarte anzeigen":
-        st.sidebar.write("Das Feature für die Temperaturkarte wird hier hinzugefügt.")
+        temperaturkarte()
     elif app_modus == "Packliste":
         packliste()
 
