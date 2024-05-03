@@ -330,6 +330,7 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
+                            st.write(index)
 
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
