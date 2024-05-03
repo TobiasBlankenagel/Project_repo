@@ -115,7 +115,6 @@ def get_weather(lat, lon):
         "lang": "de"
     }
     response = requests.get(url, params=params)
-    st.write(response)
     return response.json() if response.status_code == 200 else None
 
 @st.cache_data
@@ -344,6 +343,7 @@ def suche_fluege():
                         stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
                         ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
                         wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                        st.json(wetter_info)
                         Entfernung = get_distance(flughafen_info['latitude'], flughafen_info['longitude'], flughafen_koordinaten['latitude'], flughafen_koordinaten['longitude'])
                         flughafen_details.append({
                             "Zielort": stadt_name,
