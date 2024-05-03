@@ -309,7 +309,7 @@ def suche_fluege():
     st.title('Suche dein Reiseerlebnis!')
 
     standort = st.text_input('Gib einen Standort ein', '')
-    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today(), max_value=date.today() + timedelta(days=4))
+    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today())
     min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
     max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
     sortierschluessel = st.radio("Sortieren nach:", ['Entfernung', 'Temperatur (C)'])
@@ -319,7 +319,14 @@ def suche_fluege():
     if st.button("Suche starten") and standort:
         with st.spinner('Die Flüge werden geladen...'):
             progress = st.progress(0)  # Initiiert den Fortschrittsbalken mit 0%
- 
+            morgen = date.today() + timedelta(days=1)
+            übermorgen = date.today() + timedelta(days=2)
+            überübermorgen = date.today() + timedelta(days=3)
+            überüberübermorgen = date.today() + timedelta(days=4)
+            filtertage = [morgen, übermorgen, überübermorgen, überüberübermorgen]
+            if abflugdatum not in filtertage:
+                st.error("Das Abflugdatum muss eines der nächsten 4 Tage sein.")
+                return
 
             autocomplete_daten = fetch_autocomplete_data(standort)
             progress.progress(25)  # Setzt den Fortschrittsbalken auf 25% nach dem Abrufen der Autovervollständigungsdaten
