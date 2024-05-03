@@ -223,6 +223,7 @@ def get_price(source_iata, destination_iata, datum, iata_key):
     }
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
+    st.json(data)
     price = data['data']['flights'][1]['purchaseLinks'][0]['totalPricePerPassenger']
 
     return price
