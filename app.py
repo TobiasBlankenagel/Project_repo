@@ -275,7 +275,6 @@ def get_price(source_iata, destination_iata, datum, number):
     return price, booking_url
 
 # data['data']['flights'][number]['purchaseLinks'][0]['url']
-
 # This function is to be placed where you handle the choice of viewing the packing checklist.
 
 def sortiere_fluege(flugdaten, sortierschluessel):
@@ -292,6 +291,7 @@ def sortiere_fluege(flugdaten, sortierschluessel):
 def temperaturkarte():
     return None
 
+from datetime import timedelta
 
 def main():
     # Einrichten der Seitenleiste für die Navigation zwischen verschiedenen Funktionen
@@ -309,7 +309,7 @@ def suche_fluege():
     st.title('Suche dein Reiseerlebnis!')
 
     standort = st.text_input('Gib einen Standort ein', '')
-    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today())
+    abflugdatum = st.date_input('Wähle ein Abflugdatum', min_value=date.today(), max_value=date.today() + timedelta(days=4))
     min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
     max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
     sortierschluessel = st.radio("Sortieren nach:", ['Entfernung', 'Temperatur (C)'])
@@ -319,6 +319,8 @@ def suche_fluege():
     if st.button("Suche starten") and standort:
         with st.spinner('Die Flüge werden geladen...'):
             progress = st.progress(0)  # Initiiert den Fortschrittsbalken mit 0%
+ 
+
             autocomplete_daten = fetch_autocomplete_data(standort)
             progress.progress(25)  # Setzt den Fortschrittsbalken auf 25% nach dem Abrufen der Autovervollständigungsdaten
             if autocomplete_daten is None:
@@ -366,7 +368,6 @@ def suche_fluege():
 
                 gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
                 sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
-                progress.progress(100)  # Kompletter Fortschritt
                 # Führe eine Liste für bereits verwendete IATA-Codes
                 bereits_verwendete_iata_codes = []
 
@@ -394,6 +395,7 @@ def suche_fluege():
                             st.write(f"Entfernung: {flug['Entfernung']} km")
                             st.write(f"Preis: ${price}")
                             st.markdown(f"[Buche jetzt]({booking_url})", unsafe_allow_html=True)
+                    progress.progress(100)  # Kompletter Fortschritt
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
