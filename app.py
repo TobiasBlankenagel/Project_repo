@@ -70,7 +70,7 @@ def get_most_frequent_country(autocomplete_data):
     # Wählt das Land mit den meisten Flughäfen
     return max(country_count, key=country_count.get) if country_count else None
 
-@cached(cache)
+
 # Abfrage der Flugdaten für ein bestimmtes Datum und mehrere IATA-Codes
 def fetch_flights(departure_date, locations):
     flights_data = []
@@ -115,7 +115,6 @@ def get_weather(lat, lon):
     response = requests.get(url, params=params)
     return response.json() if response.status_code == 200 else None
 
-@cached(cache)
 def filter_flights_by_temperature(flights_details, temp_min, temp_max):
     filtered_flights = []
     for flight in flights_details:
