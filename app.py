@@ -114,8 +114,8 @@ def get_weather(lat, lon):
         "units": "metric",
         "lang": "de"
     }
-    #response = requests.get(url, params=params)
-    return None #response.json() if response.status_code == 200 else None
+    response = requests.get(url, params=params)
+    return response.json() if response.status_code == 200 else None
 
 @st.cache_data
 def filter_flights_by_temperature(flights_details, temp_min, temp_max):
@@ -357,7 +357,7 @@ def suche_fluege():
                     if flughafen_info:
                         stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
                         ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
-                        #wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                        wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
                         Entfernung = get_distance(flughafen_info['latitude'], flughafen_info['longitude'], flughafen_koordinaten['latitude'], flughafen_koordinaten['longitude'])
                         flughafen_details.append({
                             "Zielort": stadt_name,
@@ -367,8 +367,8 @@ def suche_fluege():
                             "Abflugzeit (lokal)": flug['departure']['time']['local'],
                             "Latitude": flughafen_info['latitude'],
                             "Longitude": flughafen_info['longitude'],
-                            "Wetterzustand": 1, # wetter_info['list'][wetter_nummer]['weather'][0]['description'] if wetter_info else "[Kein Wetterzustand verfügbar]",
-                            "Temperatur (C)": 1,# wetter_info['list'][wetter_nummer]['main']['temp']if wetter_info else "[Keine Temperatur verfügbar]",
+                            "Wetterzustand": wetter_info['list'][wetter_nummer]['weather'][0]['description'] if wetter_info else "[Kein Wetterzustand verfügbar]",
+                            "Temperatur (C)": wetter_info['list'][wetter_nummer]['main']['temp']if wetter_info else "[Keine Temperatur verfügbar]",
                             "Entfernung": Entfernung,
                         })
                     aktueller_fortschritt += inkrement
