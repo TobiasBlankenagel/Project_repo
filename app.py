@@ -170,34 +170,42 @@ def packliste():
     wetter_optionen = ["Sonnig", "Regen", "Schnee", "Bewölkt"]
     wetter = st.selectbox("Wähle die Wetterverhältnisse aus", wetter_optionen)
 
-    # Initialisiere die Checkliste
-    checkliste = []
+    # Button, um die Packliste zu generieren
+    generate_button = st.button("Packliste anzeigen")
 
-    # Auswahl der Packliste basierend auf Temperatur und Wetterverhältnissen
-    if temperatur < 7:
-        checkliste = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
-        if wetter == "Schnee":
-            checkliste += ["Schneeschuhe", "Wasserdichte Hose"]
-    elif 7 <= temperatur <= 17:
-        checkliste = ["Leichte Jacke", "Lange Hosen", "Pullover"]
-        if wetter == "Regen":
-            checkliste += ["Regenjacke", "Wasserdichte Schuhe"]
-    else:
-        checkliste = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
-        if wetter == "Sonnig":
-            checkliste += ["Hut", "Strandtuch"]
+    # Prüft, ob der Button geklickt wurde und speichert die Auswahl in der Session State
+    if generate_button:
+        st.session_state['temperatur'] = temperatur
+        st.session_state['wetter'] = wetter
+        st.session_state['checkliste_erzeugt'] = True
 
-    # Bestätigungsknopf um die Packliste anzuzeigen
-    if st.button("Packliste anzeigen"):
+    # Anzeigen der Packliste, wenn sie bereits generiert wurde
+    if st.session_state.get('checkliste_erzeugt', False):
+        temperatur = st.session_state['temperatur']
+        wetter = st.session_state['wetter']
+
+        checkliste = []
+        if temperatur < 7:
+            checkliste = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
+            if wetter == "Schnee":
+                checkliste += ["Schneeschuhe", "Wasserdichte Hose"]
+        elif 7 <= temperatur <= 17:
+            checkliste = ["Leichte Jacke", "Lange Hosen", "Pullover"]
+            if wetter == "Regen":
+                checkliste += ["Regenjacke", "Wasserdichte Schuhe"]
+        else:
+            checkliste = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
+            if wetter == "Sonnig":
+                checkliste += ["Hut", "Strandtuch"]
+
         st.write("Hier sind deine Packempfehlungen:")
         for artikel in checkliste:
-            # Erzeugt einen eindeutigen Schlüssel für jedes Element zur Verwendung mit Checkboxen
             checkbox_id = f"checkbox_{artikel}"
-            # Erstellt eine Checkbox direkt neben dem Artikeltext
             if st.checkbox("", key=checkbox_id, value=False):
                 st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
             else:
                 st.write(artikel)
+
 
 
 
