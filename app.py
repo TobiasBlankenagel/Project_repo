@@ -196,8 +196,31 @@ def get_distance(lat, lon, alat, alon):
     return km_distance
 
 
-def get_price():
-    return None
+def get_price(source_iata, destination_iata):
+    url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights"
+    querystring = {
+        "sourceAirportCode": source_iata,
+        "destinationAirportCode": destination_iata,
+        "date": "2024-05-05",
+        "itineraryType": "ONE_WAY",
+        "sortOrder": "PRICE",
+        "numAdults": "1",
+        "numSeniors": "0",
+        "classOfService": "ECONOMY",
+        "pageNumber": "1",
+        "nonstop": "yes",
+        "currencyCode": "USD"
+    }
+    headers = {
+        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
+        "X-RapidAPI-Host": "tripadvisor16.p.rapidapi.com"
+    }
+    
+    response = requests.get(url, headers=headers, params=querystring)
+    data = response.json()
+    price = data['data']['flights'][0]['purchaseLinks'][0]['totalPricePerPassenger']
+
+    return price
 
 # This function is to be placed where you handle the choice of viewing the packing checklist.
 
@@ -260,11 +283,11 @@ def suche_fluege():
                         ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
                         wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
                         Entfernung = get_distance(flughafen_info['latitude'], flughafen_info['longitude'], flughafen_koordinaten['latitude'], flughafen_koordinaten['longitude'])
-                        Preis = get_price()
                         flughafen_details.append({
                             "Zielort": stadt_name,
                             "Zielland": ziel_land,
                             "IATA": flug['arrival']['airport']['iata'],
+                            "IATA_dep": flug['departure']['airport']['iata'],
                             "Abflugzeit (lokal)": flug['departure']['time']['local'],
                             "Latitude": flughafen_info['latitude'],
                             "Longitude": flughafen_info['longitude'],
@@ -288,8 +311,9 @@ def suche_fluege():
                             st.write(f"Entfernung: {flug['Entfernung']} km")
                             st.write(f"Preis: {flug['Preis']}")
 
-                            if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
-                                display_flight_details(flug['IATA'])
+                            if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['IATA_dep']}"):
+                                Preis = get_price(flug['IATA_dep'], flug['IATA'])  # Stelle sicher, dass die IATA-Codes korrekt angegeben sind
+                                st.write(f"Preis für Flug von {flug['IATA_dep']} nach {flug['IATA']}: {Preis}")
                 else:
                     st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
             else:
