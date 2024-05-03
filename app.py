@@ -200,11 +200,16 @@ def packliste():
 
         st.write("Hier sind deine Packempfehlungen:")
         for artikel in checkliste:
-            checkbox_id = f"checkbox_{artikel}"
-            if st.checkbox("", key=checkbox_id, value=False):
-                st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
-            else:
-                st.write(artikel)
+            col1, col2 = st.columns([1, 4])
+            with col1:
+                checkbox_id = f"checkbox_{artikel}"
+                checked = st.checkbox("", key=checkbox_id, value=False)
+            with col2:
+                if checked:
+                    st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
+                else:
+                    st.write(artikel)
+
 
 
 
