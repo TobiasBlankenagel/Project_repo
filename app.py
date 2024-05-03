@@ -162,26 +162,43 @@ def get_city_by_coordinates(lat, lon):
 
 def packliste():
     st.title("Packliste")
-    # Die Temperatur wird jetzt als Integer abgefragt, um die Warnung zu vermeiden.
+
+    # Eingabe für die Temperatur
     temperatur = st.number_input("Wie hoch ist die Temperatur an deinem Zielort?", format='%d', step=1)
+
+    # Dropdown für die Wetterverhältnisse
+    wetter_optionen = ["Sonnig", "Regen", "Schnee", "Bewölkt"]
+    wetter = st.selectbox("Wähle die Wetterverhältnisse aus", wetter_optionen)
+
+    # Initialisiere die Checkliste
     checkliste = []
 
+    # Auswahl der Packliste basierend auf Temperatur und Wetterverhältnissen
     if temperatur < 7:
         checkliste = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
-    elif temperatur <= 17:
-        checkliste = ["Leichte Jacke", "Lange Hosen", "Pullover", "Schal"]
+        if wetter == "Schnee":
+            checkliste += ["Schneeschuhe", "Wasserdichte Hose"]
+    elif 7 <= temperatur <= 17:
+        checkliste = ["Leichte Jacke", "Lange Hosen", "Pullover"]
+        if wetter == "Regen":
+            checkliste += ["Regenjacke", "Wasserdichte Schuhe"]
     else:
         checkliste = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
+        if wetter == "Sonnig":
+            checkliste += ["Hut", "Strandtuch"]
 
-    st.write("Hier sind deine Packempfehlungen:")
-    for artikel in checkliste:
-        # Erzeugt einen eindeutigen Schlüssel für jedes Element zur Verwendung mit Checkboxen.
-        checkbox_id = f"checkbox_{artikel}"
-        # Erstellt eine Checkbox direkt neben dem Artikeltext.
-        if st.checkbox("", key=checkbox_id, value=False):
-            st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
-        else:
-            st.write(artikel)
+    # Bestätigungsknopf um die Packliste anzuzeigen
+    if st.button("Packliste anzeigen"):
+        st.write("Hier sind deine Packempfehlungen:")
+        for artikel in checkliste:
+            # Erzeugt einen eindeutigen Schlüssel für jedes Element zur Verwendung mit Checkboxen
+            checkbox_id = f"checkbox_{artikel}"
+            # Erstellt eine Checkbox direkt neben dem Artikeltext
+            if st.checkbox("", key=checkbox_id, value=False):
+                st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
+            else:
+                st.write(artikel)
+
 
 
 def get_distance(lat, lon, alat, alon):
