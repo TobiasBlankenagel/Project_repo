@@ -264,7 +264,7 @@ def get_price(source_iata, destination_iata, datum, number):
     }
  
     headers = {
-        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
+        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
         "X-RapidAPI-Host": "tripadvisor16.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
