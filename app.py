@@ -272,8 +272,14 @@ def suche_fluege():
                 land_auswahl = get_most_frequent_country(autocomplete_daten)
                 standort_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_daten.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == land_auswahl]
                 flugdaten = fetch_flights(abflugdatum.isoformat(), standort_info)
+                flugdaten_länge = len(flugdaten)
+                if flugdaten_länge > 0:
+                    inkrement = 25 / flugdaten_länge  # 25% des Fortschritts sind für diese Phase reserviert
+                else:
+                    inkrement = 25  # Vermeide Division durch Null
+                aktueller_fortschritt = 50  # Beginne bei 50% nach dem Laden der Autovervollständigungsdaten
+                progress.progress(aktueller_fortschritt)
                 flughafen_koordinaten = get_airport_details(flugdaten[0]['departure']['airport']['iata'])
-                progress.progress(50)  # Aktualisiert den Fortschrittsbalken auf 50%
 
                 flughafen_details = []
                 for flug in flugdaten:
@@ -295,7 +301,8 @@ def suche_fluege():
                             "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten",
                             "Entfernung": Entfernung,
                         })
-                progress.progress(75)  # Setzt den Fortschrittsbalken auf 75%
+                    aktueller_fortschritt += inkrement
+                    progress.progress(50+aktueller_fortschritt)  # Aktualisiere den Fortschrittsbalken und vermeide Überschreitung von 100%
 
 
                 gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
