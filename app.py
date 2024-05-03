@@ -216,56 +216,47 @@ def suche_fluege():
 
 
     if st.button("Suche starten") and standort:
-        with st.spinner('Die Flüge werden geladen...'):
-            progress = st.progress(0)  # Initiiert den Fortschrittsbalken mit 0%
-            autocomplete_daten = fetch_autocomplete_data(standort)
-            progress.progress(25)  # Setzt den Fortschrittsbalken auf 25% nach dem Abrufen der Autovervollständigungsdaten
+        autocomplete_daten = fetch_autocomplete_data(standort)
+        if autocomplete_daten is None:
+            return
+        if autocomplete_daten:
+            land_auswahl = get_most_frequent_country(autocomplete_daten)
+            standort_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_daten.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == land_auswahl]
+            flugdaten = fetch_flights(abflugdatum.isoformat(), standort_info)
+            flughafen_details = []
+            for flug in flugdaten:
+                flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
+                if flughafen_info:
+                    stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
+                    ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
+                    wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
+                    flughafen_details.append({
+                        "Zielort": stadt_name,
+                        "Zielland": ziel_land,
+                        "IATA": flug['arrival']['airport']['iata'],
+                        "Abflugzeit (lokal)": flug['departure']['time']['local'],
+                        "Latitude": flughafen_info['latitude'],
+                        "Longitude": flughafen_info['longitude'],
+                        "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
+                        "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten"
+                    })
 
-            if autocomplete_daten is None:
-                return
-            if autocomplete_daten:
-                land_auswahl = get_most_frequent_country(autocomplete_daten)
-                standort_info = [item['navigation']['relevantFlightParams']['skyId'] for item in autocomplete_daten.get('data', []) if item['navigation']['entityType'] == 'AIRPORT' and item['presentation']['subtitle'] == land_auswahl]
-                flugdaten = fetch_flights(abflugdatum.isoformat(), standort_info)
-                progress.progress(50)  # Aktualisiert den Fortschrittsbalken auf 50%
-
-                flughafen_details = []
-                for flug in flugdaten:
-                    flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
-                    if flughafen_info:
-                        stadt_name = get_city_by_coordinates(flughafen_info['latitude'], flughafen_info['longitude'])
-                        ziel_land = get_country_to_airport(flughafen_info['alpha2countryCode'])
-                        wetter_info = get_weather(flughafen_info['latitude'], flughafen_info['longitude'])
-                        flughafen_details.append({
-                            "Zielort": stadt_name,
-                            "Zielland": ziel_land,
-                            "IATA": flug['arrival']['airport']['iata'],
-                            "Abflugzeit (lokal)": flug['departure']['time']['local'],
-                            "Latitude": flughafen_info['latitude'],
-                            "Longitude": flughafen_info['longitude'],
-                            "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
-                            "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten"
-                        })
-                progress.progress(75)  # Setzt den Fortschrittsbalken auf 75%
-
-                gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
-                st.write(gefilterte_fluege)
-                progress.progress(100)  # Kompletter Fortschritt
-
-                if gefilterte_fluege:
-                    sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
-                    st.write("Gefilterte Flüge gefunden:")
-                    for flug in sortierte_fluege:
-                        with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C"):
-                            st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
-                            st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
-                            if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
-                                display_flight_details(flug['IATA'])
-                else:
-                    st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
+            gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
+            st.write(gefilterte_fluege)
+            if gefilterte_fluege:
+                sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
+                st.write("Gefilterte Flüge gefunden:")
+                for flug in sortierte_fluege:
+                    with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C"):
+                        st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
+                        st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
+                        if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
+                            display_flight_details(flug['IATA'])
             else:
-                st.error("Keine Antwort von der API. Überprüfen Sie Ihre Netzwerkverbindung oder API-Schlüssel.")
+                st.write("Keine Flüge gefunden, die den Temperaturkriterien entsprechen.")
+        else:
+            st.error("Keine Antwort von der API. Überprüfen Sie Ihre Netzwerkverbindung oder API-Schlüssel.")
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
 
