@@ -184,31 +184,44 @@ def packliste():
         temperatur = st.session_state['temperatur']
         wetter = st.session_state['wetter']
 
-        checkliste = []
-        if temperatur < 7:
-            checkliste = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
-            if wetter == "Schnee":
-                checkliste += ["Schneeschuhe", "Wasserdichte Hose"]
-        elif 7 <= temperatur <= 17:
-            checkliste = ["Leichte Jacke", "Lange Hosen", "Pullover"]
-            if wetter == "Regen":
-                checkliste += ["Regenjacke", "Wasserdichte Schuhe"]
-        else:
-            checkliste = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
-            if wetter == "Sonnig":
-                checkliste += ["Hut", "Strandtuch"]
+        # Kategorien und zugehörige Inhalte
+        kleidung = []
+        kulturbeutel = ["Zahnbürste", "Zahnpasta", "Deo", "Shampoo"]
+        dokumente = ["Reisepass", "Visum", "Kreditkarten", "Bargeld"]
 
-        st.write("Hier sind deine Packempfehlungen:")
-        for artikel in checkliste:
-            col1, col2 = st.columns([1, 4])
-            with col1:
-                checkbox_id = f"checkbox_{artikel}"
-                checked = st.checkbox("", key=checkbox_id, value=False)
-            with col2:
-                if checked:
-                    st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
-                else:
-                    st.write(artikel)
+        if temperatur < 7:
+            kleidung = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
+            if wetter == "Schnee":
+                kleidung += ["Schneeschuhe", "Wasserdichte Hose"]
+        elif 7 <= temperatur <= 17:
+            kleidung = ["Leichte Jacke", "Lange Hosen", "Pullover"]
+            if wetter == "Regen":
+                kleidung += ["Regenjacke", "Wasserdichte Schuhe"]
+        else:
+            kleidung = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
+            if wetter == "Sonnig":
+                kleidung += ["Hut", "Strandtuch"]
+
+        # Ausgabe der verschiedenen Kategorien
+        kategorien = {
+            "Kleidung": kleidung,
+            "Kulturbeutel": kulturbeutel,
+            "Dokumente": dokumente
+        }
+
+        for kategorie, inhalte in kategorien.items():
+            st.subheader(kategorie)
+            for artikel in inhalte:
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    checkbox_id = f"checkbox_{artikel}_{kategorie}"
+                    checked = st.checkbox("", key=checkbox_id, value=False)
+                with col2:
+                    if checked:
+                        st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
+                    else:
+                        st.write(artikel)
+
 
 
 
