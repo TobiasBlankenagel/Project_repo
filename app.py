@@ -186,21 +186,22 @@ def packliste():
 
         # Kategorien und zugehörige Inhalte
         kleidung = []
-        kulturbeutel = ["Zahnbürste", "Zahnpasta", "Deo", "Shampoo"]
-        dokumente = ["Reisepass", "Visum", "Kreditkarten", "Bargeld"]
+        kulturbeutel = ["Zahnbürste", "Zahnpasta", "Deo", "Shampoo", "Seife", "Sonnencreme", "Feuchtigkeitscreme", "Haarbürste"]
+        dokumente = ["Reisepass", "Visum", "Kreditkarten", "Bargeld", "Versicherungsdokumente", "Reiseplan", "Impfpass"]
 
+        # Erweiterte Liste basierend auf der Temperatur und dem Wetter
         if temperatur < 7:
-            kleidung = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche"]
+            kleidung = ["Warmjacke", "Handschuhe", "Mütze", "Thermounterwäsche", "Warmer Pullover", "Lange Unterhosen", "Sweatshirts", "7x Unterwäsche", "7x Socken"]
             if wetter == "Schnee":
-                kleidung += ["Schneeschuhe", "Wasserdichte Hose"]
+                kleidung += ["Schneeschuhe", "Wasserdichte Hose", "Warme Mütze", "Skibrille"]
         elif 7 <= temperatur <= 17:
-            kleidung = ["Leichte Jacke", "Lange Hosen", "Pullover"]
+            kleidung = ["Leichte Jacke", "Lange Hosen", "Pullover", "Langarmshirts", "7x Unterwäsche", "7x Socken"]
             if wetter == "Regen":
-                kleidung += ["Regenjacke", "Wasserdichte Schuhe"]
+                kleidung += ["Regenjacke", "Wasserdichte Schuhe", "Regenschirm"]
         else:
-            kleidung = ["T-Shirts", "Shorts", "Sonnenbrille", "Sonnencreme"]
+            kleidung = ["T-Shirts", "Shorts", "Sonnenbrille", "Badebekleidung", "Flip-Flops", "7x Unterwäsche", "7x Socken"]
             if wetter == "Sonnig":
-                kleidung += ["Hut", "Strandtuch"]
+                kleidung += ["Hut", "Strandtuch", "Strandschuhe"]
 
         # Ausgabe der verschiedenen Kategorien
         kategorien = {
@@ -221,6 +222,7 @@ def packliste():
                         st.markdown(f"<span style='text-decoration: line-through;'>{artikel}</span>", unsafe_allow_html=True)
                     else:
                         st.write(artikel)
+
 
 
 
