@@ -368,7 +368,7 @@ def suche_fluege():
                             "Latitude": flughafen_info['latitude'],
                             "Longitude": flughafen_info['longitude'],
                             "Wetterzustand": 1, # wetter_info['list'][wetter_nummer]['weather'][0]['description'] if wetter_info else "[Kein Wetterzustand verfügbar]",
-                            "Temperatur (C)": 1# wetter_info['list'][wetter_nummer]['main']['temp']if wetter_info else "[Keine Temperatur verfügbar]",
+                            "Temperatur (C)": 1,# wetter_info['list'][wetter_nummer]['main']['temp']if wetter_info else "[Keine Temperatur verfügbar]",
                             "Entfernung": Entfernung,
                         })
                     aktueller_fortschritt += inkrement
