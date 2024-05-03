@@ -243,7 +243,9 @@ def suche_fluege():
                             "Latitude": flughafen_info['latitude'],
                             "Longitude": flughafen_info['longitude'],
                             "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
-                            "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten"
+                            "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten",
+                            "Entfernung": 0,
+                            "Preis": 0,
                         })
                 progress.progress(75)  # Setzt den Fortschrittsbalken auf 75%
 
@@ -257,6 +259,9 @@ def suche_fluege():
                         with st.expander(f"Flug nach {flug['Zielort']}, {flug['Zielland']} bei {flug['Temperatur (C)']}°C"):
                             st.write(f"Abflugzeit (lokal): {flug['Abflugzeit (lokal)']}")
                             st.write(f"Wetter: {flug['Wetterzustand']} bei {flug['Temperatur (C)']} °C")
+                            st.write(f"Entfernung: {flug['Entfernung']}")
+                            st.write(f"Preis: {flug['Preis']}")
+
                             if st.button("Mehr Details", key=f"{flug['IATA']}_{flug['Abflugzeit (lokal)']}"):
                                 display_flight_details(flug['IATA'])
                 else:
