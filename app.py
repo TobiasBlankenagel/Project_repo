@@ -313,8 +313,8 @@ def suche_fluege():
                                 min_value=date.today() + timedelta(days=1),
                                 max_value=date.today() + timedelta(days=4),
                                 value=date.today() + timedelta(days=1))    
-    min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', format="%d", step=1)
-    max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', format="%d", step=1)
+    min_temp = st.number_input('Mindesttemperatur (°C) am Zielort', value=-100, format="%d", step=1)
+    max_temp = st.number_input('Höchsttemperatur (°C) am Zielort', value=100, format="%d", step=1)
     sortierschluessel = st.radio("Sortieren nach:", ['Entfernung', 'Temperatur (C)'])
 
 
