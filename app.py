@@ -335,6 +335,9 @@ def suche_fluege():
                 aktueller_fortschritt = 0.5  # Beginne bei 50% nach dem Laden der Autovervollständigungsdaten
                 progress.progress(aktueller_fortschritt)
                 flughafen_koordinaten = get_airport_details(flugdaten[0]['departure']['airport']['iata'])
+                # Berechne die Wetternummer basierend auf dem eingegebenen Datum
+                days_diff = (abflugdatum - date.today()).days
+                wetter_nummer = days_diff * 8
 
                 flughafen_details = []
                 for flug in flugdaten:
@@ -353,8 +356,8 @@ def suche_fluege():
                             "Abflugzeit (lokal)": flug['departure']['time']['local'],
                             "Latitude": flughafen_info['latitude'],
                             "Longitude": flughafen_info['longitude'],
-                            "Wetterzustand": wetter_info['weather'][0]['description'] if wetter_info else "Keine Daten",
-                            "Temperatur (C)": wetter_info['main']['temp'] if wetter_info else "Keine Daten",
+                            "Wetterzustand": wetter_info['list'][wetter_nummer]['weather'][0]['description'] if wetter_info else "[Kein Wetterzustand verfügbar]",
+                            "Temperatur (C)": wetter_info['list'][wetter_nummer]['main']['temp']if wetter_info else "[Keine Temperatur verfügbar]",
                             "Entfernung": Entfernung,
                         })
                     aktueller_fortschritt += inkrement
