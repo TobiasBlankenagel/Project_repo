@@ -12,7 +12,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
-        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
+        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
@@ -37,7 +37,7 @@ def fetch_autocomplete_data(query):
 def get_airport_details(iata_code):
     url = f"https://aviation-reference-data.p.rapidapi.com/airports/{iata_code}"
     headers = {
-        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
+        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
         "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers)
@@ -48,7 +48,7 @@ def get_airport_details(iata_code):
 def get_country_to_airport(alpha2countryCode):
     url = f"https://aviation-reference-data.p.rapidapi.com/countries/{alpha2countryCode}"
     headers = {
-        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
+        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
         "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers)
@@ -80,7 +80,7 @@ def fetch_flights(departure_date, locations):
 
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
-        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
+        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
@@ -140,7 +140,7 @@ def get_city_by_coordinates(lat, lon):
     # Increases the range to 30000 meters to find the largest nearby city
     querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
     headers = {
-        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
+        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
     }
     
@@ -350,7 +350,7 @@ def suche_fluege():
                 # Berechne die Wetternummer basierend auf dem eingegebenen Datum
                 days_diff = (abflugdatum - date.today()).days
                 wetter_nummer = days_diff * 8
-
+                
                 flughafen_details = []
                 for flug in flugdaten:
                     flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
@@ -377,6 +377,7 @@ def suche_fluege():
 
                 gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
                 sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
+                st.write(sortierte_fluege)
                 # Führe eine Liste für bereits verwendete IATA-Codes
                 bereits_verwendete_iata_codes = []
 
