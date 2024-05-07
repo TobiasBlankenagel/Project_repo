@@ -182,3 +182,44 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def get_city_by_coordinates(lat, lon):
+    url = "https://geocodeapi.p.rapidapi.com/GetNearestCities"
+    querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
+    headers = {
+        "X-RapidAPI-Key": "89fa2cdc22mshef83525ac6af5ebp10c163jsnc8047ffa3882",
+        "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
+    }
+    
+    try:
+        response = requests.get(url, headers=headers, params=querystring)
+        if response.status_code == 200:
+            data = response.json()
+            st.json(data)
+            if data and isinstance(data, list) and len(data) > 0:
+                nearest_city = data[0].get('City', 'Unknown City')
+                return nearest_city
+            else:
+                return 'No data available'
+        else:
+            return f"Error fetching data: Status Code {response.status_code}"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
