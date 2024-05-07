@@ -244,6 +244,7 @@ def get_distance(lat, lon, alat, alon):
     }
     response = requests.get(url, headers=headers, params=querystring)
     distance_data = response.json()
+    st.json(distance_data)
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
@@ -269,7 +270,6 @@ def get_price(source_iata, destination_iata, datum, number):
     }
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
-    st
     price = data['data']['flights'][number]['purchaseLinks'][0]['totalPricePerPassenger']
     booking_url = data['data']['flights'][number]['purchaseLinks'][0]['url']
 
@@ -351,7 +351,7 @@ def suche_fluege():
                 # Berechne die Wetternummer basierend auf dem eingegebenen Datum
                 days_diff = (abflugdatum - date.today()).days
                 wetter_nummer = days_diff * 8
-                
+
                 flughafen_details = []
                 for flug in flugdaten:
                     flughafen_info = get_airport_details(flug['arrival']['airport']['iata'])
@@ -385,6 +385,7 @@ def suche_fluege():
                     st.write("Gefilterte Flüge gefunden:")
                     for flug in sortierte_fluege:
                         # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
+        
                         iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
                         # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
                         if iata_key not in bereits_verwendete_iata_codes:
