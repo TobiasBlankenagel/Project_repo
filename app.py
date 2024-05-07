@@ -386,6 +386,7 @@ def suche_fluege():
                         # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
         
                         iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
+                        st.write(iata_key)
                         # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
                         if iata_key not in bereits_verwendete_iata_codes:
                             bereits_verwendete_iata_codes.append(iata_key)
@@ -393,7 +394,7 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
-
+                        st.write(bereits_verwendete_iata_codes)
                         price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
 
                         expander_key = f"expander_{iata_key}"
