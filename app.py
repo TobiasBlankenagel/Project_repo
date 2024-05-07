@@ -269,6 +269,7 @@ def get_price(source_iata, destination_iata, datum, number):
     }
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
+    st
     price = data['data']['flights'][number]['purchaseLinks'][0]['totalPricePerPassenger']
     booking_url = data['data']['flights'][number]['purchaseLinks'][0]['url']
 
@@ -377,23 +378,24 @@ def suche_fluege():
 
                 gefilterte_fluege = filter_flights_by_temperature(flughafen_details, min_temp if min_temp != 0 else None, max_temp if max_temp != 0 else None)
                 sortierte_fluege = sortiere_fluege(gefilterte_fluege, sortierschluessel)
-                st.write(sortierte_fluege)
                 # Führe eine Liste für bereits verwendete IATA-Codes
                 bereits_verwendete_iata_codes = []
 
                 if gefilterte_fluege:
                     st.write("Gefilterte Flüge gefunden:")
+                    iata_count = {}
                     for flug in sortierte_fluege:
                         # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
-        
                         iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
-                        # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
-                        if iata_key not in bereits_verwendete_iata_codes:
-                            bereits_verwendete_iata_codes.append(iata_key)
-                            index = 0
+                        # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0 und füge ihn dem Dictionary hinzu
+                        if iata_key not in iata_count:
+                            iata_count[iata_key] = 0
                         else:
-                            # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
-                            index = bereits_verwendete_iata_codes.count(iata_key)
+                            # Inkrementiere den Zähler jedes Mal, wenn der IATA-Key vorkommt
+                            iata_count[iata_key] += 1
+                
+                        # Der Index wird direkt aus dem Dictionary geholt
+                        index = iata_count[iata_key]
 
                         price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
 
