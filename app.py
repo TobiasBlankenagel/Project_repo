@@ -394,6 +394,7 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
+                        st.write(index)
                         st.write(bereits_verwendete_iata_codes)
                         price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
 
