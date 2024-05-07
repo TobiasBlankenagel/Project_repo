@@ -269,7 +269,6 @@ def get_price(source_iata, destination_iata, datum, number):
     }
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
-    st.json(data)
     price = data['data']['flights'][number]['purchaseLinks'][0]['totalPricePerPassenger']
     booking_url = data['data']['flights'][number]['purchaseLinks'][0]['url']
 
@@ -387,7 +386,6 @@ def suche_fluege():
                         # Erstelle einen einzigartigen Schlüssel für jeden Flug basierend auf Abflug- und Ankunfts-IATA
         
                         iata_key = f"{flug['IATA_dep']}_{flug['IATA']}"
-                        st.write(iata_key)
                         # Prüfe, ob der Schlüssel schon existiert, wenn nicht, setze Index auf 0
                         if iata_key not in bereits_verwendete_iata_codes:
                             bereits_verwendete_iata_codes.append(iata_key)
