@@ -244,7 +244,6 @@ def get_distance(lat, lon, alat, alon):
     }
     response = requests.get(url, headers=headers, params=querystring)
     distance_data = response.json()
-    st.json(distance_data)
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
