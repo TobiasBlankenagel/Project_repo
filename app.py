@@ -270,8 +270,8 @@ def get_price(source_iata, destination_iata, datum, number):
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
     st.json(data)
-    price = 0
-    booking_url = 0
+    price = data['data']['flights'][number]['purchaseLinks'][0]['totalPricePerPassenger']
+    booking_url = data['data']['flights'][number]['purchaseLinks'][0]['url']
 
     return price, booking_url
 
@@ -395,9 +395,12 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
-                        st.write(index)
-                        st.write(bereits_verwendete_iata_codes)
-                        price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
+                            # Verwende try-except, um die Funktion get_price sicher aufzurufen
+                        try:
+                            price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
+                        except Exception as e:
+                            continue  # Überspringe den restlichen Teil des aktuellen Durchlaufs im Loop
+
 
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
