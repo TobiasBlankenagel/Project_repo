@@ -322,7 +322,7 @@ from datetime import timedelta
 def main():
     # Einrichten der Seitenleiste für die Navigation zwischen verschiedenen Funktionen
     st.sidebar.title("Menü")
-    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Temperaturkarte anzeigen", "Packliste"])
+    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Wetter nach Ort anzeigen", "Packliste"])
 
     if app_modus == "Flüge suchen":
         suche_fluege()
