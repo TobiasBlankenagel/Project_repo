@@ -288,8 +288,34 @@ def sortiere_fluege(flugdaten, sortierschluessel):
     return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('-inf'), reverse=True)
 
 
-def temperaturkarte():
-    return None
+def wetter_ort():
+    st.title('Wetter nach Ort anzeigen')
+
+    # Eingabefeld für den Ort
+    ort = st.text_input('Gib einen Ort ein, um das Wetter zu überprüfen:', '')
+
+    if ort:
+        url = "https://api.openweathermap.org/data/2.5/weather"
+        params = {
+            "q": ort,
+            "appid": "5609e5c95ae59033e36538f65e15b9da",  # Ersetzen Sie dies durch Ihren eigenen API-Schlüssel
+            "units": "metric",
+            "lang": "de"
+        }
+        
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            temperatur = data['main']['temp']
+            wetterbeschreibung = data['weather'][0]['description']
+            wetter_icon_code = data['weather'][0]['icon']
+            wetter_icon_url = f"http://openweathermap.org/img/w/{wetter_icon_code}.png"
+            
+            st.write(f"Temperatur in {ort}: {temperatur}°C")
+            st.write(f"Wetterzustand: {wetterbeschreibung}")
+            st.image(wetter_icon_url, caption=wetterbeschreibung)
+        else:
+            st.error("Fehler beim Abrufen der Wetterdaten.")
 
 from datetime import timedelta
 
@@ -300,8 +326,8 @@ def main():
 
     if app_modus == "Flüge suchen":
         suche_fluege()
-    elif app_modus == "Temperaturkarte anzeigen":
-        temperaturkarte()
+    elif app_modus == "Wetter nach Ort anzeigen":
+        wetter_ort()
     elif app_modus == "Packliste":
         packliste()
 
