@@ -1,78 +1,58 @@
 import streamlit as st
 import requests
 
-def load_css():
-    css = """
-    <style>
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Arial', sans-serif;
-        }
-        h1 {
-            color: #4a4e69;
-            text-align: center;
-        }
-        .stTextInput>label, .stButton>button {
-            color: #4a4e69;
-        }
-        .stTextInput>div>div>input {
-            border-radius: 20px;
-            border: 2px solid #4a4e69;
-            padding: 10px;
-        }
-        .stButton>button {
-            border-radius: 20px;
-            border: none;
-            background-color: #4a4e69;
-            color: white;
-            padding: 10px 24px;
-            font-size: 16px;
-            margin-top: 10px;
-            width: 100%;
-        }
-        .report {
-            border-radius: 10px;
-            background-color: #ffffff;
-            padding: 20px;
-            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
-            margin-top: 10px;
-        }
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
+def wetter_ort():
+    st.title('Wetter nach Ort anzeigen')
+
+    # Eingabefeld für den Ort
+    ort = st.text_input('Gib einen Ort ein, um das Wetter zu überprüfen:', '')
+
+    if ort and st.button('Wetter abrufen'):
+        wetter_data = fetch_wetter(ort)
+        if wetter_data:
+            display_wetter(wetter_data, ort)
+        else:
+            st.error("Keine Wetterdaten verfügbar oder Fehler bei der Abfrage.")
+
+def fetch_wetter(ort):
+    """Holt Wetterdaten für den eingegebenen Ort."""
+    api_key = "5609e5c95ae59033e36538f65e15b9da"  # Ersetzen Sie dies durch Ihren eigenen API-Schlüssel
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "q": ort,
+        "appid": api_key,
+        "units": "metric",
+        "lang": "de"
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
+
+def display_wetter(data, ort):
+    """Zeigt das Wetter für den angegebenen Ort an."""
+    temperatur = data['main']['temp']
+    beschreibung = data['weather'][0]['description']
+    wetter_icon_code = data['weather'][0]['icon']
+    wetter_icon_url = f"http://openweathermap.org/img/w/{wetter_icon_code}.png"
+    
+    st.write(f"Temperatur in {ort}: {temperatur}°C")
+    st.write(f"Wetterzustand: {beschreibung}")
+    st.image(wetter_icon_url, caption=beschreibung)
 
 def main():
-    load_css()  # Stildefinitionen laden
-    st.title('Wetterabfrage')
+    st.sidebar.title("Menü")
+    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Wetter nach Ort anzeigen", "Packliste"])
 
-    city = st.text_input("Gib einen Ort ein:", "")
+    if app_modus == "Flüge suchen":
+        suche_fluege()
+    elif app_modus == "Wetter nach Ort anzeigen":
+        wetter_ort()
+    elif app_modus == "Packliste":
+        packliste()
 
-    if st.button('Wetter abrufen'):
-        weather = fetch_weather(city)
-        if weather:
-            display_weather(weather)
-        else:
-            st.error("Keine Wetterdaten verfügbar.")
-
-def fetch_weather(city):
-    # Simulierter API-Aufruf (ersetzen Sie diesen durch tatsächliche API-Aufrufe)
-    if city.lower() == "berlin":
-        return {
-            "temperatur": "18°C",
-            "beschreibung": "Teilweise bewölkt",
-            "wind": "10 km/h"
-        }
-    return None
-
-def display_weather(weather):
-    st.markdown(f"""
-        <div class='report'>
-            <h2>Wetterbericht</h2>
-            <p><b>Temperatur:</b> {weather['temperatur']}</p>
-            <p><b>Beschreibung:</b> {weather['beschreibung']}</p>
-            <p><b>Wind:</b> {weather['wind']}</p>
-        </div>
-    """, unsafe_allow_html=True)
+# Implementierung anderer Funktionen bleibt wie zuvor
 
 if __name__ == "__main__":
     main()
