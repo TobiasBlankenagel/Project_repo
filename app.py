@@ -1,38 +1,41 @@
 import streamlit as st
+import requests
 
 def load_css():
     css = """
     <style>
         body {
-            background-color: #f4f4f9;
-            font-family: 'Arial';
+            background-color: #f0f2f5;
+            font-family: 'Arial', sans-serif;
         }
         h1 {
-            color: #333;
+            color: #4a4e69;
             text-align: center;
         }
-        .stTextInput>label, .stDateInput>label, .stNumberInput>label, .stSelectbox>label {
-            color: #333;
+        .stTextInput>label, .stButton>button {
+            color: #4a4e69;
         }
-        .stTextInput>div>div>input, .stNumberInput>div>div>input {
-            border-radius: 10px;
-            border: 1px solid #ccc;
+        .stTextInput>div>div>input {
+            border-radius: 20px;
+            border: 2px solid #4a4e69;
+            padding: 10px;
         }
         .stButton>button {
-            width: 100%;
+            border-radius: 20px;
             border: none;
+            background-color: #4a4e69;
             color: white;
-            padding: 10px 20px;
-            text-align: center;
-            background-color: #0068c9;
-            border-radius: 5px;
+            padding: 10px 24px;
+            font-size: 16px;
             margin-top: 10px;
+            width: 100%;
         }
-        .stMarkdown {
-            background-color: #fff;
+        .report {
             border-radius: 10px;
+            background-color: #ffffff;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+            margin-top: 10px;
         }
     </style>
     """
@@ -40,24 +43,36 @@ def load_css():
 
 def main():
     load_css()  # Stildefinitionen laden
-    st.title('Meine verbesserte Streamlit-Seite')
+    st.title('Wetterabfrage')
 
-    st.markdown("""
-        <div style='background-color: #e8eaf6; padding: 10px; border-radius: 5px;'>
-            <h2>Willkommen auf meiner Seite!</h2>
-            <p>Füllen Sie das Formular unten aus, um Informationen zu erhalten.</p>
+    city = st.text_input("Gib einen Ort ein:", "")
+
+    if st.button('Wetter abrufen'):
+        weather = fetch_weather(city)
+        if weather:
+            display_weather(weather)
+        else:
+            st.error("Keine Wetterdaten verfügbar.")
+
+def fetch_weather(city):
+    # Simulierter API-Aufruf (ersetzen Sie diesen durch tatsächliche API-Aufrufe)
+    if city.lower() == "berlin":
+        return {
+            "temperatur": "18°C",
+            "beschreibung": "Teilweise bewölkt",
+            "wind": "10 km/h"
+        }
+    return None
+
+def display_weather(weather):
+    st.markdown(f"""
+        <div class='report'>
+            <h2>Wetterbericht</h2>
+            <p><b>Temperatur:</b> {weather['temperatur']}</p>
+            <p><b>Beschreibung:</b> {weather['beschreibung']}</p>
+            <p><b>Wind:</b> {weather['wind']}</p>
         </div>
     """, unsafe_allow_html=True)
-
-    name = st.text_input("Name:")
-    alter = st.number_input("Alter:", min_value=0, max_value=100, step=1)
-    geburtsdatum = st.date_input("Geburtsdatum:")
-
-    optionen = ["Option 1", "Option 2", "Option 3"]
-    auswahl = st.selectbox("Wähle eine Option:", optionen)
-
-    if st.button('Submit'):
-        st.success(f"Hallo {name}, du hast {auswahl} gewählt.")
 
 if __name__ == "__main__":
     main()
