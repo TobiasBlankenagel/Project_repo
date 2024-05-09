@@ -12,7 +12,7 @@ def fetch_autocomplete_data(query):
     url = "https://skyscanner80.p.rapidapi.com/api/v1/flights/auto-complete"
     querystring = {"query": query, "market": "DE", "locale": "de-DE"}
     headers = {
-        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
         "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
     }
     time.sleep(1)  # Verzögerung, um weniger wie ein Bot zu wirken
@@ -37,7 +37,7 @@ def fetch_autocomplete_data(query):
 def get_airport_details(iata_code):
     url = f"https://aviation-reference-data.p.rapidapi.com/airports/{iata_code}"
     headers = {
-        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
         "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers)
@@ -48,7 +48,7 @@ def get_airport_details(iata_code):
 def get_country_to_airport(alpha2countryCode):
     url = f"https://aviation-reference-data.p.rapidapi.com/countries/{alpha2countryCode}"
     headers = {
-        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
+        "X-RapidAPI-Key": "bd2791b14fmsh26f690b30808f74p1470d4jsn29b1b6dceb93",
         "X-RapidAPI-Host": "aviation-reference-data.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers)
@@ -80,7 +80,7 @@ def fetch_flights(departure_date, locations):
 
     url = "https://flight-info-api.p.rapidapi.com/schedules"
     headers = {
-        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
+        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
         "X-RapidAPI-Host": "flight-info-api.p.rapidapi.com"
     }
 
@@ -140,7 +140,7 @@ def get_city_by_coordinates(lat, lon):
     # Increases the range to 30000 meters to find the largest nearby city
     querystring = {"latitude": str(lat), "longitude": str(lon), "range": "30000"}
     headers = {
-        "X-RapidAPI-Key": "38689512camshe3b1a61297f895bp1d88bejsn77ddfd92f83f",
+        "X-RapidAPI-Key": "d356198924msh06e2296a42b90aep15c29ejsnee52f22cf3dd",
         "X-RapidAPI-Host": "geocodeapi.p.rapidapi.com"
     }
     
@@ -244,6 +244,7 @@ def get_distance(lat, lon, alat, alon):
     }
     response = requests.get(url, headers=headers, params=querystring)
     distance_data = response.json()
+    st.json(distance_data)
     km_distance = round(distance_data['body']['distance']['kilometers'], 2)
     return km_distance
 
@@ -288,46 +289,49 @@ def sortiere_fluege(flugdaten, sortierschluessel):
     return sorted(flugdaten, key=lambda x: x[sortierschluessel] if x[sortierschluessel] is not None else float('-inf'), reverse=True)
 
 
-def wetter_ort():
-    st.title('Wetter nach Ort anzeigen')
-
-    # Eingabefeld für den Ort
-    ort = st.text_input('Gib einen Ort ein, um das Wetter zu überprüfen:', '')
-
-    if ort:
-        url = "https://api.openweathermap.org/data/2.5/weather"
-        params = {
-            "q": ort,
-            "appid": "5609e5c95ae59033e36538f65e15b9da",  # Ersetzen Sie dies durch Ihren eigenen API-Schlüssel
-            "units": "metric",
-            "lang": "de"
-        }
-        
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            data = response.json()
-            temperatur = data['main']['temp']
-            wetterbeschreibung = data['weather'][0]['description']
-            wetter_icon_code = data['weather'][0]['icon']
-            wetter_icon_url = f"http://openweathermap.org/img/w/{wetter_icon_code}.png"
-            
-            st.write(f"Temperatur in {ort}: {temperatur}°C")
-            st.write(f"Wetterzustand: {wetterbeschreibung}")
-            st.image(wetter_icon_url, caption=wetterbeschreibung)
-        else:
-            st.error("Fehler beim Abrufen der Wetterdaten.")
+def temperaturkarte():
+    return None
 
 from datetime import timedelta
+
+
+def load_css():
+    css = """
+    <style>
+        h1 {
+            color: blue;
+        }
+        .stTextInput>label {
+            color: green;
+        }
+        .css-1lcbmhc {
+            padding: 10px;
+        }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+load_css()
+
+
+def custom_button():
+    button_html = """
+    <button class='btn btn-primary' style='width: 100%; margin-bottom: 10px;'>Mein Button</button>
+    """
+    st.markdown(button_html, unsafe_allow_html=True)
+
+custom_button()
+
 
 def main():
     # Einrichten der Seitenleiste für die Navigation zwischen verschiedenen Funktionen
     st.sidebar.title("Menü")
-    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Wetter nach Ort anzeigen", "Packliste"])
+    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Temperaturkarte anzeigen", "Packliste"])
 
     if app_modus == "Flüge suchen":
         suche_fluege()
-    elif app_modus == "Wetter nach Ort anzeigen":
-        wetter_ort()
+    elif app_modus == "Temperaturkarte anzeigen":
+        temperaturkarte()
     elif app_modus == "Packliste":
         packliste()
 
@@ -419,12 +423,8 @@ def suche_fluege():
                         else:
                             # Zähle, wie oft dieser IATA-Key schon vorgekommen ist, um den Index zu ermitteln
                             index = bereits_verwendete_iata_codes.count(iata_key)
-                            # Verwende try-except, um die Funktion get_price sicher aufzurufen
-                        try:
-                            price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
-                        except Exception as e:
-                            continue  # Überspringe den restlichen Teil des aktuellen Durchlaufs im Loop
 
+                        price, booking_url = get_price(flug['IATA_dep'], flug['IATA'], abflugdatum, index)
 
                         expander_key = f"expander_{iata_key}"
                         expanded = st.session_state.get(expander_key, False)
