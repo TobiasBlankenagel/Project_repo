@@ -46,7 +46,7 @@ def fetch_location_data(city):
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
         "q": city,
-        "appid": "YOUR_API_KEY",  # Ersetzen Sie 'YOUR_API_KEY' mit Ihrem eigenen API-Schlüssel
+        "appid": "5609e5c95ae59033e36538f65e15b9da",  # Ersetzen Sie 'YOUR_API_KEY' mit Ihrem eigenen API-Schlüssel
     }
     response = requests.get(url, params=params)
     if response.status_code == 200:
