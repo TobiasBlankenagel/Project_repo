@@ -45,12 +45,8 @@ def main():
     st.sidebar.title("Menü")
     app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Wetter nach Ort anzeigen", "Packliste"])
 
-    if app_modus == "Flüge suchen":
-        suche_fluege()
     elif app_modus == "Wetter nach Ort anzeigen":
         wetter_ort()
-    elif app_modus == "Packliste":
-        packliste()
 
 # Implementierung anderer Funktionen bleibt wie zuvor
 
