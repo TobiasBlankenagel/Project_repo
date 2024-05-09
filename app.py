@@ -43,9 +43,9 @@ def display_wetter(data, ort):
 
 def main():
     st.sidebar.title("Menü")
-    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Flüge suchen", "Wetter nach Ort anzeigen", "Packliste"])
+    app_modus = st.sidebar.selectbox("Wähle eine Option", ["Wetter nach Ort anzeigen"])
 
-    elif app_modus == "Wetter nach Ort anzeigen":
+    if app_modus == "Wetter nach Ort anzeigen":
         wetter_ort()
 
 # Implementierung anderer Funktionen bleibt wie zuvor
