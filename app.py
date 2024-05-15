@@ -537,42 +537,44 @@ def suche_fluege():
     departure_date = st.text_input("Abflugdatum (YYYY-MM-DD):", "2024-06-01")
 
     if st.button("Flüge suchen"):
-        amadeus_api = AmadeusAPI(AMADEUS_API_KEY, AMADEUS_API_SECRET, AMADEUS_API_URLs['base_url'])
-        weather_api = OpenWeatherAPI(OPEN_WEATHER_API_KEY)
+        if abflugort.lower() == "frankfurt":
+            amadeus_api = AmadeusAPI(AMADEUS_API_KEY, AMADEUS_API_SECRET, AMADEUS_API_URLs['base_url'])
+            weather_api = OpenWeatherAPI(OPEN_WEATHER_API_KEY)
 
-        if not amadeus_api.authenticate():
-            st.error("Authentifizierung mit der Amadeus API fehlgeschlagen.")
-            return
+            if not amadeus_api.authenticate():
+                st.error("Authentifizierung mit der Amadeus API fehlgeschlagen.")
+                return
 
-        iata_codes = get_iata_codes(amadeus_api, abflugort)
-        if not iata_codes:
-            st.error(f"Keine IATA-Codes für den angegebenen Abflughafen {abflugort} gefunden.")
-            return
+            iata_codes = get_iata_codes(amadeus_api, abflugort)
+            if not iata_codes:
+                st.error("Keine IATA-Codes für den angegebenen Abflughafen gefunden.")
+                return
 
-        flights_df = find_cheapest_flight_destinations(
-            amadeus_api, iata_codes, departure_date, one_way=False, duration="1,10", non_stop=False, max_price=1000, view_by="DURATION"
-        )
+            flights_df = find_cheapest_flight_destinations(
+                amadeus_api, iata_codes, departure_date, one_way=False, duration="1,10", non_stop=False, max_price=1000, view_by="DURATION"
+            )
 
-        if flights_df.empty:
-            st.write("Keine Flüge gefunden.")
-            return
+            if flights_df.empty:
+                st.write("Keine Flüge gefunden.")
+                return
 
-        filtered_flights_df = filter_flights_by_weather(weather_api, flights_df, min_temperatur, max_temperatur)
-        if filtered_flights_df.empty:
-            st.write("Keine Flüge gefunden, die die Temperaturkriterien erfüllen.")
+            filtered_flights_df = filter_flights_by_weather(weather_api, flights_df, min_temperatur, max_temperatur)
+            if filtered_flights_df.empty:
+                st.write("Keine Flüge gefunden, die die Temperaturkriterien erfüllen.")
+            else:
+                st.write("Verfügbare Flüge:")
+                df = filtered_flights_df.rename(columns={
+                    "destination": "Zielort",
+                    "departureDate": "Abflugdatum",
+                    "returnDate": "Rückkehrdatum",
+                    "price": "Preis (€)",
+                    "Average Temperature": "Durchschnittstemperatur (°C)"
+                })
+                df["Preis (€)"] = df["Preis (€)"].round(2)
+                df["Durchschnittstemperatur (°C)"] = df["Durchschnittstemperatur (°C)"].round(2)
+                st.dataframe(df.sort_values(by=["Preis (€)"], ascending=True))
         else:
-            st.write("Verfügbare Flüge:")
-            df = filtered_flights_df.rename(columns={
-                "destination": "Zielort",
-                "departureDate": "Abflugdatum",
-                "returnDate": "Rückkehrdatum",
-                "price": "Preis (€)",
-                "Average Temperature": "Durchschnittstemperatur (°C)"
-            })
-            df["Preis (€)"] = df["Preis (€)"].round(2)
-            df["Durchschnittstemperatur (°C)"] = df["Durchschnittstemperatur (°C)"].round(2)
-            st.dataframe(df.sort_values(by=["Preis (€)"], ascending=True))
-
+            st.write("Derzeit sind nur Flüge von Frankfurt verfügbar.")
 
 # Fetch Weather Data
 def fetch_weather_data(city):
